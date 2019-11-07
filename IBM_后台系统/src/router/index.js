@@ -6,8 +6,8 @@ import Main from '@/views/Main'
 // 登录页
 import Login from '@/views/Login/Index'
 // 首页
-import Home from '@/views/User/Home/index'
-// import Home from '@/views/User/Home/index2'
+// import Home from '@/views/User/Home/index'
+import Home from '@/views/User/Home/index2'
 // 个人资料
 import PersonalProfile from '@/views/User/account/information/index'
 // 数字货币钱包
