@@ -1,0 +1,341 @@
+@charset "UTF-8";
+/*
+*{
+    -webkit-overflow-scrolling: touch;
+  }
+  */
+* {
+  margin: 0px;
+  padding: 0px;
+}
+
+/* ==========================提示框============= */
+.el-message-box {
+  border: none !important;
+  width: 3.5rem !important;
+}
+
+.el-message-box .el-message-box__title {
+  color: #fff !important;
+}
+
+.el-message-box__headerbtn .el-message-box__close {
+  color: #fff !important;
+}
+
+.el-message-box__content {
+  padding-bottom: 15px !important;
+}
+
+.el-message-box__header {
+  background: #004994 !important;
+}
+
+.el-message-box--center .el-message-box__header {
+  padding: 10px !important;
+}
+
+.el-message-box--center {
+  padding-bottom: 10px !important;
+}
+
+.newClass {
+  width: 50%;
+}
+
+.newClass_100 {
+  width: 100%;
+}
+
+/* ==========================手机类型选择============= */
+/* .el-input-group__append, .el-input-group__prepend{
+    border: none!important;
+}
+.reset_select{
+    width: .8rem;
+    background: #32A8EE!important;
+    color: #fff!important;
+} */
+/* ============================输入框的按钮======== */
+/* .el-input-group__append, .codeWrap .el-input-group__prepend{
+    background: #0d1743!important;
+    border: none;
+    padding: 0 25px;
+  }
+  button.el-button.codeBtn.el-button--default{
+    border: none;
+    background: #32A8EE!important;
+    color: #fff!important;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    padding-left: 10px;
+    padding-right: 10px;
+  } */
+/* ============================模态框================ */
+.el-dialog__wrapper {
+  z-index: 99999 !important;
+}
+
+.el-dialog__title {
+  color: #fff !important;
+}
+
+.el-dialog__header {
+  background: #004994 !important;
+}
+
+.el-dialog__headerbtn .el-dialog__close {
+  color: #fff !important;
+}
+
+/* ============================单选================ */
+/* ===============================表单域============== */
+.el-textarea__inner {
+  /* background: $btn_bg;
+    border: none!important;
+    color: #fff!important; */
+}
+
+/* =================================输入框====================== */
+/* .el-input{
+    .el-input__inner{
+        @include input_style;
+        @include placeholder_default;
+    }
+}
+.el-input__prefix, .el-input__suffix{
+    color: $default_color;
+}
+.el-input.is-disabled .el-input__inner{
+    @include input_style;
+    @include placeholder_default;
+} */
+/* ===================================时间选择器====================== */
+/* .el-picker-panel{
+    background-color: $btn_bg;
+    border-color: $shade_border;
+    color: $default_color;
+}
+.el-picker-panel__icon-btn,
+.el-date-picker__header-label,
+.el-date-table th,
+.el-month-table td .cell,
+.el-year-table td .cell {
+    color: #fff!important;
+}
+.el-date-table td.next-month, .el-date-table td.prev-month{
+    color: #606266!important;
+}
+.el-date-table td.disabled div{
+    background-color: $shade_border;
+}
+.el-date-table th{
+    border-bottom: 1px solid rgba(255,255,255,.2)!important;
+} */
+/* =====================================选择器===================== */
+/* .el-select .el-input__inner{
+    background: rgba(13,23,67,1)!important;
+    border: none;
+    color: #fff;
+}
+.reset_select .el-input__inner{
+    background: #32A8EE !important;
+}
+.el-select .el-input .el-select__caret{
+    color: #fff!important;
+}
+.el-select-dropdown {
+    background-color: $shade_bg;
+    border: 1px solid $shade_border;
+}
+.el-popper[x-placement^="top"] .popper__arrow {
+  border-top-color: $shade_border;
+  z-index: -1;
+}
+.el-popper[x-placement^="top"] .popper__arrow::after {
+  border-top-color: $shade_border;
+}
+.el-popper[x-placement^="bottom"] .popper__arrow {
+  border-bottom-color: $shade_border;
+  z-index: -1;
+}
+.el-popper[x-placement^="bottom"] .popper__arrow::after {
+  border-bottom-color: $shade_border;
+}
+.el-select-dropdown__item{
+    color: #fff!important;
+}
+.el-select-dropdown__item.hover,
+.el-select-dropdown__item:hover {
+  background-color: $btn_active_bg;
+}
+.el-select-dropdown__item.selected{
+    color: #fff!important;
+}
+.el-select-dropdown__empty{
+    color: #fff!important;
+} */
+/* =====================================遮罩层======================= */
+.el-loading-mask {
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* ===============================================菜单======================= */
+.el-menu-item:focus, .el-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.el-submenu__title:hover, .el-submenu__title:focus, .el-submenu__title:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.el-menu {
+  border-right: none !important;
+  background: none;
+}
+
+.el-submenu__title i {
+  color: #fff !important;
+}
+
+.el-menu-item i {
+  color: #fff !important;
+}
+
+.el-menu-item, .el-submenu__title {
+  height: 40px !important;
+  line-height: 40px !important;
+}
+
+/* =========================================滚动条====================== */
+.el-scrollbar__wrap {
+  overflow-x: hidden !important;
+  margin-bottom: 0px !important;
+}
+
+/* ======================================form组件======================= */
+.item_form .el-form-item__label {
+  color: #000 !important;
+}
+
+/* ======================================分页器============================= */
+/* .el-pagination{
+    color: #fff!important;
+    .el-pagination__total{
+        color: inherit;
+    }
+}
+.el-pagination .el-input__inner{
+    background: $btn_bg;
+    border:none;
+    color: #fff!important;
+    height: inherit;
+    line-height: inherit;
+}
+.el-pagination .el-select__caret{
+    color: #fff!important;
+}
+.el-pagination .el-pagination__jump{
+    color: #fff!important;
+}
+.el-pagination .btn-prev{
+    background: none!important;
+    color: #fff!important;
+}
+.el-pagination .btn-next{
+    background: none!important;
+    color: #fff!important;
+}
+.el-pagination button:disabled{
+    background: none!important;
+}
+.el-pagination .el-pager li{
+    background: $btn_bg;
+    padding: 0px;
+    margin: 0 .05rem;
+    border-radius: .04rem;
+    font-size: .14rem;
+    font-weight: 400;
+}
+.el-pager li.active{
+    color: #fff!important;
+    background: $btn_active_bg;
+}
+.el-pager li.btn-quicknext, .el-pager li.btn-quickprev{
+    color: #fff!important;
+} */
+/* ==============================================表格============================= */
+.rowClassName {
+  color: #004994 !important;
+  font-size: .14rem;
+  font-family: SourceHanSansCN-Bold;
+  font-weight: 400;
+}
+
+.headerRowClassName {
+  color: #004994 !important;
+  font-size: .14rem;
+  font-family: SourceHanSansCN-Bold;
+  font-weight: bold;
+}
+
+.el-table th, .el-table tr {
+  background: #e6eff9 !important;
+}
+
+.el-table {
+  box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.1);
+}
+
+.el-table th {
+  text-align: center !important;
+  height: .4rem;
+  background: #FAFAFA !important;
+  padding: 10px 0;
+  font-size: .14rem;
+}
+
+.el-table th.is-leaf {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.el-table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-size: .14rem;
+  padding: 5px 0;
+  height: .34rem;
+  text-align: center !important;
+}
+
+.el-table .el-table--group::after,
+.el-table .el-table--border::after,
+.el-table .el-table::before {
+  background: #0d1743 !important;
+}
+
+.el-table .el-table__fixed::before,
+.el-table .el-table__fixed-right::before {
+  background: #0d1743 !important;
+}
+
+.el-table .el-table__body-wrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.el-table .el-table__body-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(144, 147, 153, 0.3) !important;
+  border-radius: 3px;
+}
+
+.el-table--enable-row-hover .el-table__body tr:hover > td {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.el-menu, .el-menu--horizontal > .el-menu-item:not(.is-disabled):focus, .el-menu--horizontal > .el-menu-item:not(.is-disabled):hover, .el-menu--horizontal > .el-submenu .el-submenu__title:hover {
+  background: none !important;
+}
+
+.el-table--border td, .el-table--border th, .el-table__body-wrapper .el-table--border.is-scrolling-left ~ .el-table__fixed {
+  border-right: 1px solid #fff !important;
+}

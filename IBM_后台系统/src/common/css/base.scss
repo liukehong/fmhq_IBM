@@ -1,0 +1,161 @@
+$smallSize: 500px;
+@mixin tran-horizontal($percentage, $time) {
+  @if $percentage != 0 {
+    transform: translateX($percentage);
+    -moz-transform: translateX($percentage);
+    -webkit-transform: translateX($percentage);
+    -o-transform: translateX($percentage);
+  }
+  transition: transform $time ease;
+  -moz-transition: transform $time ease;
+  -webkit-transition: transform $time ease;
+  -o-transition: transform $time ease;
+}
+.column_scroll {
+  height: 100%;
+  .el-scrollbar__wrap {
+    overflow-x: hidden!important;
+  }
+}
+*{box-sizing: border-box;}
+
+.line{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+.line3{
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+html {
+  font-size: 100px;
+  width: 100%;
+  height: 100%;
+
+  body {
+    width: 100%;
+    height: 100%;
+    font-size: 0.16rem;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; // word-break: break-all;
+  }
+
+  @media screen and (max-width: 1500px) {
+    font-size: 95px;
+  }
+
+  @media screen and (max-width: 960px) {
+    font-size: 90px;
+  }
+
+  @media screen and (max-width: 480px) {
+    font-size: 85px;
+  }
+
+  @media screen and (max-width: 375px) {
+    font-size: 85px;
+  }
+}
+
+$theme_bg: #fff; //背景色主题色
+$theme_btn_bg: #90c31f; //按钮主题色
+$pc1500: 1500px;
+$pc1200: 1200px;
+$ipad_width: 768px; //ipad设备宽度
+$iphone6_width: 376px; //iphone6设备宽度
+$iphone4_width: 320px; //iphone4设备宽度
+
+.rem_2{
+  width: 2rem;
+}
+.rem_100{
+  width: 100%;
+}
+.container{
+  // color: #fff;
+  padding: .4rem .42rem;
+  @media screen and (max-width: $ipad_width) {
+    padding: 4%;
+  };
+  padding: 0.42rem;
+}
+.item_title{
+  height: .18rem;
+  line-height: .18rem;
+  margin-bottom: .33rem;
+  font-size: .18rem;
+  font-weight: bold;
+  padding-left: .14rem;
+  overflow: hidden;
+  position: relative;
+  color: #004994;
+}
+.item_title:after{
+  content: '';
+  position: absolute;
+  top: 0px; left: 0px;
+  height: .18rem; width: .04rem;
+  background: #004994;
+}
+.item_box{
+  box-shadow:0px 17px 67px 0px rgba(83,93,113,0.06);
+  background: #fff;
+  overflow: hidden;
+  border-radius: .1rem;
+  // 表单
+  .item_list_box{
+    padding: .2rem;
+    @media screen and (max-width: $ipad_width) {
+      padding: 5%;
+    };
+    .item_form{
+      max-width: 6rem;
+    }
+  }
+  // table列表
+  .item_table_box{
+    // padding-left: .39rem;
+    padding-left: .1rem;
+    padding-right: .1rem;
+    padding-top: .2rem;
+    min-height: 300px;
+    .time_label{
+      // padding-right: .2rem;
+    }
+    .sel_label{
+      // padding: .1rem .2rem .2rem 0;
+      padding: .1rem 0 .2rem 0;
+      .sel_input{
+        float:left;
+        width: 2rem;
+      }
+      .sel_btn{
+        float:left; 
+        margin-left: .2rem;
+      }
+    }
+    .sel_label_0{
+      padding-top: 0px!important;
+    }
+    .pagination_box{
+      padding: .1rem .2rem;
+      .sel_label{
+        padding: .1rem .2rem;
+      }
+    }
+  }
+}
+.fade-enter{
+  opacity: 0;
+  transform:translateY(2rem);
+}
+.fade-enter-active{
+  transition: all .8s;
+}
+.fade-leave{
+  opacity: 0;
+}
