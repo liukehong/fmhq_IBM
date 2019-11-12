@@ -6,8 +6,8 @@ import Main from '@/views/Main'
 // 登录页
 import Login from '@/views/Login/Index'
 // 首页
-import Home from '@/views/User/Home/index'
-// import Home from '@/views/User/Home/index2'
+// import Home from '@/views/User/Home/index'
+import Home from '@/views/User/Home/index2'
 // 个人资料
 import PersonalProfile from '@/views/User/account/information/index'
 // 数字货币钱包
@@ -18,6 +18,8 @@ import PassManage from '@/views/User/account/password'
 import TransactionPass from '@/views/User/account/payPassword'
 // 财务转账
 import AssetTransfer from '@/views/User/account/asset'
+// 修改邮箱
+import Email from '@/views/User/account/email'
 // 手机号码管理
 import PhoneManage from '@/views//User/account/phone'
 // OTP2手机号码管理
@@ -115,6 +117,11 @@ const MY_ACCOUNT = {
       path: `${comData.conutry_type}`+'/user/account/asset',
       name: 'asset_transfer',
       component: AssetTransfer
+    },
+    {
+      path: `${comData.conutry_type}`+'/user/account/email',
+      name: 'asset_email',
+      component: Email
     },
     {
       path: `${comData.conutry_type}`+'/user/account/phone',

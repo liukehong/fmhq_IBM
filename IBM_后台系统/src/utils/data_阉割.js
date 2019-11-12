@@ -161,6 +161,11 @@ const data = {
                             haschildren: false,
                             index: COUNTRY_TYPE+'/user/account/opt2_phone',
                         }, */
+                        /* {
+                            name: _this.$t('admin_feedback.changeEmail'), // 修改邮箱
+                            haschildren: false,
+                            index: COUNTRY_TYPE+'/user/account/email',
+                        }, */
                         {
                             name: _this.$t('user.asset_transfer'), // 财务转账
                             haschildren: false,

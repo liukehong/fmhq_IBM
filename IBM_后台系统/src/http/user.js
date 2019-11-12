@@ -369,6 +369,14 @@ export const IBM_UTILS_OPT2 = data => {
         data
     })
 }
+// 发送ot2邮箱验证码
+export const IBM_UTILS_EMAILOPT2 = data => {
+    return axios({
+        url: `/ibm/utils/emailOtp2`,
+        method: 'post',
+        data
+    })
+}
 // 修改OTP2手机号
 export const IBM_USER_UPDATEOPT2 = data => {
     return axios({
@@ -432,6 +440,7 @@ export default {
     IBM_FEEDBACK_ADDREPLY,
     IBM_HOME_NOTICEINFO,
     IBM_UTILS_OPT2,
+    IBM_UTILS_EMAILOPT2,
     IBM_USER_UPDATEOPT2,
     IBM_USER_DEPT
 }

@@ -1163,7 +1163,7 @@ const en = {
     },
     other: {
         text1: 'Get Verification Code Mode',
-        text2: 'Phone',
+        text2: 'SMS',
         text3: 'Current Email',
     }
 };

@@ -45,6 +45,13 @@
                 <el-radio :label="2">{{ $t('register.email') }}</el-radio>
               </el-radio-group>
             </el-form-item>
+            <!-- 当前手机号 -->
+            <el-form-item
+              v-if="sendCodeType == 2"
+              :label="sendCodeType == 1?$t('phone_manage.now_manage'):$t('other.text3')"
+            >
+              <div>{{ sendCodeType == 1?ruleForm.mobile:curEmail }}</div>
+            </el-form-item>
             <!-- 验证码 -->
             <el-form-item :label="$t('transaction_pass.code')" prop="code">
               <el-input :placeholder="$t('transaction_pass.code')" v-model="ruleForm.code">
@@ -77,6 +84,7 @@ export default {
   data() {
     return {
       sendCodeType: 1, // 1 手机号 2邮箱
+      curEmail: '', // 当前邮箱
       phoneCode: "+86",
       ruleForm: {
         password: "", // 账号密码
@@ -135,6 +143,7 @@ export default {
       vm.fnGetNewInfo().then(res => {
         vm.$main.loading = false;
         vm.ruleForm.mobile = res.mobile;
+        vm.curEmail = res.email;
       });
     },
     // 二级密码验证

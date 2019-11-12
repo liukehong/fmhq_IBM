@@ -60,13 +60,30 @@
               clearable
             ></el-input>
           </el-form-item>
+          <!-- 验证码方式 -->
+          <el-form-item v-if="ruleForm.os_type == 1&&loginType == 0" >
+             <el-select
+              style="width: 100%;"
+              v-model="sendCodeType"
+              placeholder="请选择"
+            >
+              <el-option
+                :label="$t('other.text2')"
+                :value="1"
+              ></el-option>
+              <el-option
+                :label="$t('register.email')"
+                :value="2"
+              ></el-option>
+            </el-select>
+          </el-form-item>
           <!-- 验证码 -->
           <el-form-item v-if="ruleForm.os_type == 1&&loginType == 0" class="codeWrap" prop="mobileCode">
             <el-input :placeholder="$t('login.code')" v-model="ruleForm.mobileCode">
               <template slot="append">
                 <GetCode
                   class="codeBtn"
-                  apiUrl="IBM_UTILS_OPT2"
+                  :apiUrl="sendCodeType == 1?'IBM_UTILS_OPT2':'IBM_UTILS_EMAILOPT2'"
                   :username="ruleForm.username"
                   :btnText="btnText"
                 ></GetCode>
@@ -141,6 +158,7 @@ export default {
   },
   data() {
     return {
+      sendCodeType: 1,
       btnText: this.$t('transaction_pass.get'),
       loginType: this.fnLoginType(), // 0 用户  1管理员  2管理员2
       dialogVisible: false, // 模态框控制

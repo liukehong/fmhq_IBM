@@ -178,11 +178,18 @@
               <div v-if="ruleForm.status != 0">{{ ruleForm.address }}</div>
             </el-form-item>
             <!-- 获取验证码方式 -->
-            <el-form-item :label="$t('other.text1')">
+            <el-form-item :label="$t('other.text1')" v-if="ruleForm.status == 0">
               <el-radio-group v-model="sendCodeType">
                 <el-radio :label="1">{{ $t('other.text2') }}</el-radio>
                 <el-radio :label="2">{{ $t('register.email') }}</el-radio>
               </el-radio-group>
+            </el-form-item>
+            <!-- 当前手机号 -->
+            <el-form-item
+               v-if="ruleForm.status == 0"
+              :label="sendCodeType == 1?$t('phone_manage.now_manage'):$t('other.text3')"
+            >
+              <div>{{ sendCodeType == 1?ruleForm.mobile:curEmail }}</div>
             </el-form-item>
             <!-- 验证码 -->
             <el-form-item
@@ -229,6 +236,7 @@ export default {
   data() {
     return {
       sendCodeType: 1, // 1 手机号 2邮箱
+      curEmail: '', // 当前邮箱
       lanType: "zh", // zh中文 en英文 jp日文
       ruleForm: {
         name: "", // 真实姓名
@@ -306,6 +314,7 @@ export default {
           }
         }
         keyObj("ruleForm", res); // 遍历可修改的信息
+        vm.curEmail = res.email;
         // 省份
         if (!!res.country) {
           vm.fnGetCityList(1, res.country);

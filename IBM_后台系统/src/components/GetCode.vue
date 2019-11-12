@@ -42,6 +42,12 @@ export default {
         params = {
           username: vm.username
         };
+      }else if( vm.apiUrl == 'IBM_UTILS_EMAILOPT2' ){
+        debugger
+
+        params = {
+          username: vm.username
+        };
       }
       return params;
     },
@@ -53,7 +59,12 @@ export default {
           vm.fnOpenMessageBox(vm.errTxt || vm.$t("login.loginErrInfo.username")); // 请输入用户名
           return false;
         }
-      } else {
+      }else if(vm.apiUrl == 'IBM_UTILS_EMAILOPT2'){
+        if( !!!vm.username ){
+          vm.fnOpenMessageBox(vm.errTxt || vm.$t("login.loginErrInfo.username")); // 请输入用户名
+          return false;
+        }
+      }else {
         if (vm.mobile == "") {
           vm.fnOpenMessageBox(vm.errTxt || vm.$t("forgetErrInfo.phone")); // 请输入手机号
           return false;
