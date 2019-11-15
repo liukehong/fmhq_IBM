@@ -93,7 +93,7 @@ const data = {
                 break;
             case 2:
                 // 本地
-                return "http://192.168.1.144:8080"
+                return "http://192.168.1.161:8080"
                 break;
             default:
                 return "https://api.ibmcapital.co:18443"

@@ -19,7 +19,7 @@
   路由: 首页引用 @/views/User/Home/index2
 */
 // 1正式版  2是阉割版
-const os_type = 2;
+const os_type = 1;
 // 国家类型
 const COUNTRY_TYPE = '';  // '' /jp  这个不需要改
 const COUNTRY_TYPE_1 = '';  // '' /jp
@@ -50,21 +50,21 @@ const data = {
     inviteUrl: (function (num) {
         switch (num) {
             case 0:
-                // 测试
-                return "https://www.hswow.cn"+COUNTRY_TYPE_1
-                break;
-            case 1:
                 // 正式版本
                 return "https://partner.ibmcapital.co"+COUNTRY_TYPE_1
                 break;
-            case 2:
+            case 1:
                 // 阉割版
                 return "https://login.ibmcapital.co"+COUNTRY_TYPE_1
+                break;
+            case 2:
+                // 测试
+                return "https://www.hswow.cn"+COUNTRY_TYPE_1
                 break;
             default:
                 return "https://partner.ibmcapital.co"+COUNTRY_TYPE_1
         }
-    })(os_type),
+    })(0),
     // user的token名称
     tokenName: (function (num) {
         switch (num) {
@@ -93,7 +93,7 @@ const data = {
                 break;
             case 2:
                 // 本地
-                return "http://192.168.1.144:8080"
+                return "http://192.168.1.161:8080"
                 break;
             default:
                 return "https://api.ibmcapital.co:18443"
@@ -156,11 +156,11 @@ const data = {
                             haschildren: false,
                             index: COUNTRY_TYPE+'/user/account/phone',
                         },
-                        /* {
+                        {
                             name: _this.$t('user.opt2_phone_manage'), // 更换OTP2手机号
                             haschildren: false,
                             index: COUNTRY_TYPE+'/user/account/opt2_phone',
-                        }, */
+                        },
                         /* {
                             name: _this.$t('admin_feedback.changeEmail'), // 修改邮箱
                             haschildren: false,
@@ -184,11 +184,11 @@ const data = {
                             haschildren: false,
                             index: COUNTRY_TYPE+'/user/wallet/cp',
                         },
-                        /* {
+                        {
                             name: _this.$t('user.e_wallet'), // 电子钱包
                             haschildren: false,
                             index: COUNTRY_TYPE+'/user/wallet/ele',
-                        }, */
+                        },
                         {
                             name: _this.$t('user.reg_wallet'), // 注册钱包
                             haschildren: false,
@@ -198,7 +198,7 @@ const data = {
                             name: _this.$t('user.mt4_wallet'), // MT4盈利钱包
                             haschildren: false,
                             index: COUNTRY_TYPE+'/user/wallet/mt4',
-                        },
+                        }, 
                     ],
                 },
                 {
@@ -279,12 +279,12 @@ const data = {
                     ]
                 },
                 // 推荐列表
-                /* {
+                {
                     name: _this.$t('user.lower_list'),
                     icon: 'el-icon-document',
                     haschildren: false,
                     index: COUNTRY_TYPE+'/user/lowerList',
-                }, */
+                },
                 //会员反馈
                 {
                     name: _this.$t('user.feedback'), // 会员反馈
