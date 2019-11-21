@@ -277,7 +277,8 @@ export default {
       vm.loading = true;
       let params = {
         usd: vm.usd_val, // 美元
-        rate: 6.75, // 汇率
+        // rate: 6.75, // 汇率
+        rate: '', // 汇率
         from: vm.currency.toUpperCase(), // 支付的币种
         to: vm.rate, // 该币种兑美元的汇率
         money: vm.coin_val // 支付的金额
