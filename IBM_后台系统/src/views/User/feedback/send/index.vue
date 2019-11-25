@@ -180,6 +180,13 @@ export default {
     // 表单提交
     submitForm(formName) {
       let vm = this;
+      // console.log(vm.ruleForm.content);
+      // console.log(document.getElementsByClassName('w-e-text')[0].innerText.replace(/\ +/g,"").length);
+      // return false;
+      if(vm.ruleForm.content.length>1500){
+        vm.fnOpenMessageBox(vm.$t('other.text4'), "error");
+        return false;
+      }
       let params;
       vm.myValidate(formName).then(err => {
         if (!!!err) {

@@ -1165,6 +1165,7 @@ const en = {
         text1: 'Get Verification Code Mode',
         text2: 'SMS',
         text3: 'Current Email',
+        text4: "Can't Exceed 1500 Characters!"
     }
 };
 export default en;

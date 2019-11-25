@@ -241,7 +241,7 @@ export default {
       ruleForm: {
         name: "", // 真实姓名
         englishName: "", // 英文名
-        sex: 1, // 性别 1男 2女
+        sex: 1,
         cardType: 1, // 证件类型
         country: "", // 国家
         province: "", // 省份

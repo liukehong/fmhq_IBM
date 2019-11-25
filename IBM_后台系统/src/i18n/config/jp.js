@@ -1163,6 +1163,7 @@ const jp = {
     text1: '認証コードの取得方法',
     text2: '携帯電話',
     text3: '現在のメールボックス',
+    text4: '1500文字を超えてはいけません。'
   }
 };
 export default jp;

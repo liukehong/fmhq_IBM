@@ -1170,6 +1170,7 @@ const zh = {
     text1: '获取验证码方式',
     text2: '手机短信',
     text3: '当前邮箱',
+    text4: '不能超过1500个字符！'
   }
 };
 export default zh;

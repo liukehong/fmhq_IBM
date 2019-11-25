@@ -281,6 +281,10 @@ export default {
         vm.fnOpenMessageBox(vm.$t('admin_feedback.replyErrInfo.replyContent'), "error");
         return false;
       }
+      if(vm.ruleForm.content.length>1500){
+        vm.fnOpenMessageBox(vm.$t('other.text4'), "error");
+        return false;
+      }
       vm.$refs[formName].validate(valid => {
         if (valid) {
           let params = Object.assign({}, vm.ruleForm);

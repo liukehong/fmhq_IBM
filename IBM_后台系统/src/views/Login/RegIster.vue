@@ -166,7 +166,7 @@ export default {
         name: "", // 真实姓名
         cardNum: "", // 身份证
         cardType: 1, // 身份证类型
-        sex: 0 //性别
+        sex: 1 //性别
       },
       rules: {
         englishName: [
