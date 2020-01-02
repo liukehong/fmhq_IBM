@@ -147,17 +147,70 @@
         ></el-pagination>
       </div>
     </div>
+    <el-dialog
+      :modal-append-to-body="false"
+      :title="$t('notice_detail.editErrInfo.sureDel')"
+      :visible.sync="dialogVisible"
+      :width="screenSize == 1?'22%':'90%'"
+      center
+    >
+      <el-form
+        style="padding: .2rem;"
+        label-position="top"
+        label-width="1.6rem"
+        class="demo-ruleForm item_form"
+      >
+        <!-- 获取验证码方式 -->
+        <el-form-item :label="$t('other.text1')">
+          <el-radio-group v-model="sendCodeType">
+            <el-radio :label="1">{{ $t('other.text2') }}</el-radio>
+            <el-radio :label="2">{{ $t('register.email') }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <!-- 验证码 -->
+        <el-form-item :label="$t('transaction_pass.code')">
+          <el-input :placeholder="$t('transaction_pass.code')" v-model="phoneCord">
+            <template slot="append">
+              <GetCode
+                v-if="!!dialogVisible"
+                apiUrl="IBM_UTILS_GETSECURITYCODE"
+                :mobile="phone"
+                :codeType1="sendCodeType"
+              ></GetCode>
+            </template>
+          </el-input>
+        </el-form-item>
+        <!-- 请先输入验证码 -->
+        <div
+          v-if="!!codeNull"
+          style="text-align:center; color: red;"
+        >{{ $t('transaction_pass.resetPassErrInfo.beforeCode') }}</div>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <!-- 确 定 -->
+        <el-button @click="dialogVisible = false">{{ $t('el.datepicker.cancel') }}</el-button>
+        <el-button type="primary" @click="fnDoSomeModal">{{ $t('el.colorpicker.confirm') }}</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
   <script>
 import WatchScreen from "../../../mixins/watchScreen.js";
 import MessageBox from "@/mixins/messageBox.js";
+import GetCode from "@/components/GetCode1";
 export default {
   name: "member_list_list",
   mixins: [WatchScreen, MessageBox],
   inject: ["p", "$main"],
   data() {
     return {
+      id: '',
+      phone: "",
+      codeNull: false,
+      sendCodeType: 1, // 1 手机号 2邮箱
+      dialogVisible: false,
+      dept: "",
+      phoneCord: "",
       sizeList: [10, 15, 20, 25, 30],
       currentPage: 1,
       tableData: [],
@@ -173,47 +226,89 @@ export default {
       total: 0
     };
   },
+  components: {
+    GetCode
+  },
   mounted: function() {
     let vm = this;
+    vm.dept = vm.$main.userInfo.deptId;
+    vm.phone = vm.$main.userInfo.mobile;
     vm.fnGetData();
   },
   methods: {
+    // 模态框点击事件
+    fnDoSomeModal() {
+      let vm = this;
+      if (!!!vm.phoneCord) {
+        vm.codeNull = true;
+      } else {
+        vm.dialogVisible = false;
+        // 接口
+        vm.$main.loading = true;
+        vm.$api
+          .IBM_ADMIN_DELECTUSER({
+            uId: vm.id,
+            security_code: vm.phoneCord
+          })
+          .then(res => {
+            vm.$main.loading = false;
+            if (res.code == 0) {
+              vm.fnOpenMessageBox(
+                vm.$t("notice_detail.editErrInfo.delSuc"),
+                "success"
+              ); // 删除成功
+              vm.fnGetData();
+            } else {
+              vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
+            }
+          });
+      }
+    },
     // 删除用户
     fnDelete(data) {
       let vm = this;
-      // 确认删除
-      // 提示
-      vm.$confirm(
-        vm.$t("notice_detail.editErrInfo.sureDel"),
-        vm.$t("system_container.tips"),
-        {
-          confirmButtonText: vm.$t("system_container.ok"), // 确认
-          cancelButtonText: vm.$t("system_container.no"), // 取消
-          type: "warning"
-        }
-      )
-        .then(() => {
-          // 调删除接口
-          vm.$main.loading = true;
-          console.log(data.user_id, 2233);
-          vm.$api
-            .IBM_ADMIN_DELECTUSER({
-              uId: data.user_id
-            })
-            .then(res => {
-              vm.$main.loading = false;
-              if (res.code == 0) {
-                vm.fnOpenMessageBox(
-                  vm.$t("notice_detail.editErrInfo.delSuc"),
-                  "success"
-                ); // 删除成功
-                vm.fnGetData();
-              } else {
-                vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
-              }
-            });
-        })
-        .catch(() => {});
+      if (vm.dept == 11) {
+        // 打开模特框的初始化
+        vm.sendCodeType = 1;
+        vm.phoneCord = "";
+        vm.codeNull = false;
+        vm.dialogVisible = true;
+        vm.id = data.user_id;
+      } else {
+        // 确认删除
+        // 提示
+        vm.$confirm(
+          vm.$t("notice_detail.editErrInfo.sureDel"),
+          vm.$t("system_container.tips"),
+          {
+            confirmButtonText: vm.$t("system_container.ok"), // 确认
+            cancelButtonText: vm.$t("system_container.no"), // 取消
+            type: "warning"
+          }
+        )
+          .then(() => {
+            // 调删除接口
+            vm.$main.loading = true;
+            console.log(data.user_id, 2233);
+            vm.$api
+              .IBM_ADMIN_DELECTUSER({
+                uId: data.user_id
+              })
+              .then(res => {
+                vm.$main.loading = false;
+                if (res.code == 0) {
+                  vm.fnOpenMessageBox(
+                    vm.$t("notice_detail.editErrInfo.delSuc"),
+                    "success"
+                  ); // 删除成功
+                  vm.fnGetData();
+                } else {
+                  vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
+                }
+              });
+          })
+          .catch(() => {});
+      }
     },
     // 状态
     STATUS(data) {

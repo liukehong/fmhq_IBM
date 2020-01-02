@@ -20,7 +20,7 @@
       >
         <template v-for="item1 in menuList">
           <!-- 只有一级菜单 -->
-          <el-menu-item v-if="!!!item1.haschildren" :index="item1.index" :key="item1.index">
+          <el-menu-item v-if="fnShowMenu(item1)" :index="item1.index" :key="item1.index">
             <i :class="item1.icon"></i>
             <span slot="title">{{ item1.name }}</span>
           </el-menu-item>
@@ -66,15 +66,45 @@ export default {
       },
       default_active: "", // 值是menuList里的index，这里index对应的是跳转路径
       menuList: [],
+      organization: "",
+      dept: ""
     };
   },
   mounted: function() {
     let active = this.$route.path;
     this.default_active = active;
+    if (!!window.localStorage.getItem("userInfo")) {
+      let userInfo = JSON.parse(window.localStorage.getItem("userInfo"));
+      this.organization = userInfo.organization;
+      this.dept = userInfo.dept;
+    }
     this.initMenuList();
-    // this.fnInit();
   },
   methods: {
+    fnShowMenu(data) {
+      if (!!window.localStorage.getItem("userInfo")) {
+        let userInfo = JSON.parse(window.localStorage.getItem("userInfo"));
+        this.organization = userInfo.organization;
+        this.dept = userInfo.dept;
+      }
+      if (!!!data.haschildren) {
+        if (this.dept == 31) {
+          return true;
+        }
+        // 如果是partner以及organization == 1则展示推荐列表
+        if (data.index == "/user/lowerList") {
+          if (comData.os_type == 1 && this.organization == 1) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return true;
+        }
+      } else {
+        return false;
+      }
+    },
     handleSelect(index, indexPath) {
       let vm = this;
       let w = document.documentElement.offsetWidth || document.body.offsetWidth;
@@ -92,17 +122,24 @@ export default {
       } else {
         num = "0";
       }
-      this.menuList = comData.menuList(num, this);
+      // 如果id是2844387这个用户，只能看到反馈内容
+      let userInfo = JSON.parse(window.localStorage.getItem("userInfo"));
+      let arrs = [
+        {
+          name: this.$t("admin.admin_feedback"), // 反馈信息
+          haschildren: false,
+          index: "admin_feedback",
+          icon: "el-icon-s-comment",
+          list: []
+        }
+      ];
+      if (userInfo.userId == 2844387) {
+        this.menuList = arrs;
+        // this.menuList = comData.menuList(num, this);
+      } else {
+        this.menuList = comData.menuList(num, this);
+      }
     }
-    /* fnInit () {
-      let vm = this;
-      // 获取用户信息
-      vm.fnGetNewInfo().then(res=>{
-        console.log(res,999999999)
-        vm.user.userId = res.userId;
-        vm.user.username = res.username;
-      })
-    } */
   },
   watch: {
     $route(to, from) {

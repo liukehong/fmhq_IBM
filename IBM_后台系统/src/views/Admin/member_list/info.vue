@@ -52,7 +52,10 @@
             <el-option value="1" :label="$t('personal_profile.id_card')"></el-option>
             <!-- 护照 -->
             <!-- <el-option value="0" :label="$t('personal_profile.passport')"></el-option> -->
-            <el-option :value="ruleForm.cardType!=1?ruleForm.cardType:0" :label="$t('personal_profile.passport')"></el-option>
+            <el-option
+              :value="ruleForm.cardType!=1?ruleForm.cardType:0"
+              :label="$t('personal_profile.passport')"
+            ></el-option>
           </el-select>
         </el-form-item>
         <!-- 证件号码 -->
@@ -154,12 +157,27 @@
         <el-form-item :label="$t('personal_profile.usdt_addr')+'：'">
           <el-input :placeholder="$t('personal_profile.usdt_addr')" v-model="ruleForm.usdt"></el-input>
         </el-form-item>
+        <!-- 获取验证码方式 -->
+        <el-form-item :label="$t('other.text1')" v-if="dept == 11">
+          <el-radio-group v-model="sendCodeType">
+            <el-radio :label="1">{{ $t('other.text2') }}</el-radio>
+            <el-radio :label="2">{{ $t('register.email') }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <!-- 验证码 -->
+        <el-form-item :label="$t('transaction_pass.code')" v-if="dept == 11">
+          <el-input :placeholder="$t('transaction_pass.code')" v-model="phoneCord">
+            <template slot="append">
+              <GetCode apiUrl="IBM_UTILS_GETSECURITYCODE" :mobile="phone" :codeType1="sendCodeType"></GetCode>
+            </template>
+          </el-input>
+        </el-form-item>
       </div>
       <!-- 审核 -->
       <el-dialog
         :modal-append-to-body="false"
         :title="$t('personal_profile.audit')"
-        :visible.sync="dialogVisible"
+        :visible.sync="dialogVisible1"
         :width="screenSize == 1?'40%':'90%'"
       >
         <el-form
@@ -197,10 +215,36 @@
               v-model="ruleForm1.reasonEnglish"
             ></el-input>
           </el-form-item>
+
+          <!-- 获取验证码方式 -->
+          <el-form-item :label="$t('other.text1')">
+            <el-radio-group v-model="sendCodeType1">
+              <el-radio :label="1">{{ $t('other.text2') }}</el-radio>
+              <el-radio :label="2">{{ $t('register.email') }}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <!-- 验证码 -->
+          <el-form-item :label="$t('transaction_pass.code')">
+            <el-input :placeholder="$t('transaction_pass.code')" v-model="phoneCord1">
+              <template slot="append">
+                <GetCode
+                  v-if="!!dialogVisible1"
+                  apiUrl="IBM_UTILS_GETSECURITYCODE"
+                  :mobile="phone"
+                  :codeType1="sendCodeType1"
+                ></GetCode>
+              </template>
+            </el-input>
+          </el-form-item>
+          <!-- 请先输入验证码 -->
+          <div
+            v-if="!!codeNull"
+            style="text-align:center; color: red;"
+          >{{ $t('transaction_pass.resetPassErrInfo.beforeCode') }}</div>
         </el-form>
         <span slot="footer" class="dialog-footer">
           <!-- 取 消 -->
-          <el-button @click="dialogVisible = false">{{ $t('system_container.no') }}</el-button>
+          <el-button @click="dialogVisible1 = false">{{ $t('system_container.no') }}</el-button>
           <!-- 确 定 -->
           <el-button type="primary" @click="fnDoSome">{{ $t('el.colorpicker.confirm') }}</el-button>
         </span>
@@ -211,11 +255,8 @@
     <!-- 登录会员系统 -->
     <el-button type="primary" @click="fnEnterUserManage">{{ $t('personal_profile.login_user') }}</el-button>
     <!-- 审核 -->
-    <el-button
-      v-if="user.status == 1"
-      type="primary"
-      @click="fnExamine"
-    >{{ $t('personal_profile.audit') }}</el-button>
+    <!-- v-if="user.status == 1" -->
+    <el-button v-if="user.status == 1" type="primary" @click="fnExamine">{{ $t('personal_profile.audit') }}</el-button>
     <!-- 返回 -->
     <el-button
       :class="screenSize == 1?'':'butStyle'"
@@ -230,14 +271,24 @@ import WatchScreen from "../../../mixins/watchScreen.js";
 import GetUserInfo from "../../../mixins/getUserInfo.js";
 import MessageBox from "@/mixins/messageBox.js";
 import comData from "@/utils/data.js";
+import GetCode from "@/components/GetCode1";
 export default {
   name: "member_list_info",
   mixins: [WatchScreen, GetUserInfo, MessageBox],
   inject: ["p", "$main"],
   data() {
     return {
+      phone: "",
+      sendCodeType: 1, // 1 手机号 2邮箱
+      dept: "",
+      phoneCord: "",
+
+      codeNull: false,
+      sendCodeType1: 1, // 1 手机号 2邮箱
+      phoneCord1: "",
+
       lanType: "zh", // zh中文 en英文 jp日文
-      dialogVisible: false,
+      dialogVisible1: false,
       user: {
         username: "", // 用户名
         rp: "", // 注册钱包
@@ -277,10 +328,13 @@ export default {
     };
   },
   components: {
-    Upload
+    Upload,
+    GetCode
   },
   mounted: function() {
     let vm = this;
+    vm.dept = vm.$main.userInfo.deptId;
+    vm.phone = vm.$main.userInfo.mobile;
     if (window.localStorage.getItem("locale")) {
       vm.lanType = window.localStorage.getItem("locale");
     }
@@ -295,7 +349,13 @@ export default {
     // 打开模态框
     fnExamine() {
       let vm = this;
-      vm.dialogVisible = true;
+
+      // 打开模特框的初始化
+      vm.sendCodeType1 = 1;
+      vm.phoneCord1 = "";
+      vm.codeNull = false;
+
+      vm.dialogVisible1 = true;
     },
     fnDoSome() {
       let vm = this;
@@ -305,21 +365,33 @@ export default {
         reasonEnglish: vm.ruleForm1.reasonEnglish,
         user_id: vm.ruleForm.userId
       };
-      console.log(params);
-      vm.dialogVisible = false;
-      vm.$main.loading = true;
-      vm.$api.IBM_ADMIN_USEREXAMINE(params).then(res => {
-        vm.$main.loading = false;
-        if (res.code == 0) {
-          vm.fnOpenMessageBox(
-            vm.$t("withdraw_audit.auditErrInfo.handle"),
-            "success"
-          );
-          vm.fnInit();
+      if (vm.dept == 11) {
+        params.security_code = vm.phoneCord1;
+        if (!!!vm.phoneCord1) {
+          vm.codeNull = true;
         } else {
-          vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
+          dd();
         }
-      });
+      }else{
+        dd();
+      }
+
+      function dd() {
+        vm.dialogVisible1 = false;
+        vm.$main.loading = true;
+        vm.$api.IBM_ADMIN_USEREXAMINE(params).then(res => {
+          vm.$main.loading = false;
+          if (res.code == 0) {
+            vm.fnOpenMessageBox(
+              vm.$t("withdraw_audit.auditErrInfo.handle"),
+              "success"
+            );
+            vm.fnInit();
+          } else {
+            vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
+          }
+        });
+      }
     },
     // 登录会员系统
     fnEnterUserManage() {
@@ -422,13 +494,16 @@ export default {
           }
           params.type = 0;
           params.sex = vm.ruleForm.sex;
-          params.btc = vm.ruleForm.btc||'';
-          params.usdt = vm.ruleForm.usdt||'';
-          params.eth = vm.ruleForm.eth||'';
-          if(vm.ruleForm.cardType != 1){
+          params.btc = vm.ruleForm.btc || "";
+          params.usdt = vm.ruleForm.usdt || "";
+          params.eth = vm.ruleForm.eth || "";
+          if (vm.ruleForm.cardType != 1) {
             params.cardType = 0;
           }
           console.log(params);
+          if (vm.dept == 11) {
+            params.security_code = vm.phoneCord;
+          }
           vm.$main.loading = true;
           vm.$api.IBM_ADMIN_UPDATEUSER(params).then(res => {
             vm.$main.loading = false;

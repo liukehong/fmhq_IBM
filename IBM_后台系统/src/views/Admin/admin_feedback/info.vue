@@ -27,7 +27,7 @@
               :key="index"
               class="screenshot_item"
             >
-              <img :src="item" alt>
+              <img :src="item" alt />
             </li>
           </ul>
         </el-form-item>
@@ -49,7 +49,15 @@
                 <!-- 内容 -->
                 <div v-html="item.content"></div>
                 <!-- 图 -->
-                <img class="aImg" v-for="(aImg,i) in item.cion.split(',')" :key="i" @click="fnSeeBigImg(aImg)" v-if="item.cion" :src="aImg" alt="">
+                <img
+                  class="aImg"
+                  v-for="(aImg,i) in item.cion.split(',')"
+                  :key="i"
+                  @click="fnSeeBigImg(aImg)"
+                  v-if="item.cion"
+                  :src="aImg"
+                  alt
+                />
               </div>
               <!-- 回复时间 -->
               <p
@@ -95,20 +103,39 @@
             parentName="admin_feedback_info"
             pathName="ruleForm.cion"
             :imageUrl="ruleForm.cion"
-          ></Upload> -->
+          ></Upload>-->
           <el-upload
-                :on-exceed="handleExceed"
-                :limit="3"
-                :action="path"
-                :data="params1"
-                name="Filedata"
-                list-type="picture-card"
-                :on-preview="handlePictureCardPreview"
-                :on-remove="handleRemove"
-                :on-success="handleAvatarSuccess"
-              >
-                <i class="el-icon-plus"></i>
+            :on-exceed="handleExceed"
+            :limit="3"
+            :action="path"
+            :data="params1"
+            name="Filedata"
+            list-type="picture-card"
+            :on-preview="handlePictureCardPreview"
+            :on-remove="handleRemove"
+            :on-success="handleAvatarSuccess"
+          >
+            <i class="el-icon-plus"></i>
           </el-upload>
+        </el-form-item>
+        <!-- 获取验证码方式 -->
+        <el-form-item :label="$t('other.text1')" v-if="dept == 11">
+          <el-radio-group v-model="sendCodeType">
+            <el-radio :label="1">{{ $t('other.text2') }}</el-radio>
+            <el-radio :label="2">{{ $t('register.email') }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <!-- 验证码 -->
+        <el-form-item
+          :label="$t('transaction_pass.code')"
+          style="max-width: 6rem;"
+          v-if="dept == 11"
+        >
+          <el-input :placeholder="$t('transaction_pass.code')" v-model="phoneCord">
+            <template slot="append">
+              <GetCode apiUrl="IBM_UTILS_GETSECURITYCODE" :mobile="phone" :codeType1="sendCodeType"></GetCode>
+            </template>
+          </el-input>
         </el-form-item>
         <el-form-item>
           <!-- 提交 -->
@@ -129,6 +156,7 @@ import BigImg from "@/components/BigImg";
 import MessageBox from "@/mixins/messageBox.js";
 import Editor from "@/components/Editor";
 import comData from "@/utils/data.js";
+import GetCode from "@/components/GetCode1";
 export default {
   name: "admin_feedback_info",
   mixins: [WatchScreen, MessageBox],
@@ -136,16 +164,20 @@ export default {
   components: {
     Upload,
     BigImg,
-    Editor
+    Editor,
+    GetCode
   },
   data() {
     return {
+      phone: "",
+      sendCodeType: 1, // 1 手机号 2邮箱
+      dept: "",
+      phoneCord: "",
       params1: {
         token: JSON.parse(window.localStorage.getItem("token"))
       },
       path: comData.path + "/ibm/utils/upload",
       dialogImageUrl: "",
-
 
       showHeader: true,
       sizeList: [10, 15, 20, 25, 30],
@@ -180,6 +212,8 @@ export default {
   },
   mounted: function() {
     let vm = this;
+    vm.dept = vm.$main.userInfo.deptId;
+    vm.phone = vm.$main.userInfo.mobile;
     vm.fnGetData();
   },
   methods: {
@@ -284,13 +318,18 @@ export default {
         );
         return false;
       }
-      if(vm.ruleForm.content.length>1500){
-        vm.fnOpenMessageBox(vm.$t('other.text4'), "error");
+      if (vm.ruleForm.content.length > 1500) {
+        vm.fnOpenMessageBox(vm.$t("other.text4"), "error");
         return false;
       }
       vm.$refs[formName].validate(valid => {
         if (valid) {
           let params = Object.assign({}, vm.ruleForm);
+
+          if (vm.dept == 11) {
+            params.security_code = vm.phoneCord;
+          }
+
           vm.$main.loading = true;
           vm.$api.IBM_ADMIN_ADDREPLY(params).then(res => {
             vm.$main.loading = false;
@@ -315,13 +354,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.aImg{
-  width:.94rem; 
-  height: .94rem; 
-  display:inline-block; 
+.aImg {
+  width: 0.94rem;
+  height: 0.94rem;
+  display: inline-block;
   cursor: pointer;
-  margin-right: .2rem;
-  margin-top: .1rem;
+  margin-right: 0.2rem;
+  margin-top: 0.1rem;
 }
 .item_form {
   max-width: 100% !important;

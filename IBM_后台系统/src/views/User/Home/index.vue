@@ -70,7 +70,7 @@
               <el-row>
                 <el-col class="personal-wrap personal-style" :span="24" :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
                   <div class="meal_icon">
-                    <img :src="ben.mt4Icon?ben.mt4Icon:''" alt="">
+                    <img :src="mt4Icon?mt4Icon:''" alt="">
                   </div>
                   <div class="meal_div">
                     <!-- 配置列表 -->
@@ -135,7 +135,7 @@
           </div>
         </div>
       </el-col>
-      <el-col class="col-item" :span="24" :xs="24" :sm="24" :md="24" :lg="24" :xl="8">
+      <el-col class="col-item" :span="24" :xs="24" :sm="24" :md="24" :lg="24" :xl="8" v-if="dept == 31">
         <div class="mime-item item-box">
           <!-- 个人资料 -->
           <div class="title line">
@@ -199,6 +199,7 @@ export default {
   inject: ['$main'],
   data () {
     return {
+      mt4Icon: '',
       userInfo: '', // 用户信息
       ben: '', // 个人资料
       ap: '',
@@ -206,6 +207,7 @@ export default {
       rp: '',
       prevTime: '', // 上次登录时间
       userId: '', // 用户id
+      dept: '',
     }
   },
   components: {
@@ -213,6 +215,11 @@ export default {
     EchartTow
   },
   mounted: function () {
+    let vm = this;
+    if (!!window.localStorage.getItem("userInfo")) {
+      let userInfo = JSON.parse(window.localStorage.getItem("userInfo"));
+      this.dept = userInfo.dept;
+    }
     this.fnInit();
   },
   methods: {
@@ -235,6 +242,7 @@ export default {
       // 获取用户资产信息
       vm.$api.IBM_HOME_PERSONALASSETS().then(res=>{
         vm.prevTime = res.data.date;
+        vm.mt4Icon = res.data.mt4.icon;
       })
       // 获取个人资料
       vm.$api.IBM_HOME_TJT().then(res=>{

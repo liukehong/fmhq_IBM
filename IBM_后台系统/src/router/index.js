@@ -6,8 +6,8 @@ import Main from '@/views/Main'
 // 登录页
 import Login from '@/views/Login/Index'
 // 首页
-// import Home from '@/views/User/Home/index'
-import Home from '@/views/User/Home/index2'
+import Home from '@/views/User/Home/index'
+// import Home from '@/views/User/Home/index2'
 // 个人资料
 import PersonalProfile from '@/views/User/account/information/index'
 // 数字货币钱包
@@ -311,11 +311,14 @@ import destroy_audit from '@/views/Admin/destroy_audit/index'
 import unusual_audit from '@/views/Admin/unusual_audit/index'
 // MT4出金列表
 import admin_transfer from '@/views/Admin/admin_transfer/index'
+// 推荐列表
+import recommend_list from '@/views/Admin/recommend_list/index'
 
 // 管理员登录
 const LOGIN_ADMIN = {
   // path: '/admin_login',
-  path: `${comData.conutry_type}`+'/admin_login',
+  // path: `${comData.conutry_type}`+'/admin_login',
+  path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK',
   name: 'admin',
   component: Login,
 }
@@ -326,79 +329,84 @@ const ADMIN_ROUTER = {
   component: Main,
   children: [
     {
-      path: `${comData.conutry_type}`+'/admin/admin_home',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/admin_home',
       name: 'admin_home',
       component: admin_home
     },
     {
-      path: `${comData.conutry_type}`+'/admin/withdraw_history',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/withdraw_history',
       name: 'withdraw_history',
       component: withdraw_history
     },
     {
-      path: `${comData.conutry_type}`+'/admin/recharge_history',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/recharge_history',
       name: 'recharge_history',
       component: recharge_history
     },
     {
-      path: `${comData.conutry_type}`+'/admin/net_fund',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/net_fund',
       name: 'net_fund',
       component: net_fund
     },
     {
-      path: `${comData.conutry_type}`+'/admin/wallet_report',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/wallet_report',
       name: 'wallet_report',
       component: wallet_report
     },
     {
-      path: `${comData.conutry_type}`+'/admin/withdraw_audit',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/withdraw_audit',
       name: 'withdraw_audit',
       component: withdraw_audit
     },
     {
-      path: `${comData.conutry_type}`+'/admin/admin_transfer',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/admin_transfer',
       name: 'admin_transfer',
       component: admin_transfer
     },
     {
-      path: `${comData.conutry_type}`+'/admin/member_list',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/member_list',
       name: 'member_list',
       component: member_list,
     },
     {
-      path: `${comData.conutry_type}`+'/admin/member_info',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/member_info',
       name: 'member_info',
       component: member_info
     },
     {
-      path: `${comData.conutry_type}`+'/admin/product_report',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/product_report',
       name: 'product_report',
       component: product_report
     },
     {
-      path: `${comData.conutry_type}`+'/admin/admin_feedback',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/admin_feedback',
       name: 'admin_feedback',
       component: admin_feedback
     },
     {
-      path: `${comData.conutry_type}`+'/admin/notice_list',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/notice_list',
       name: 'notice_list',
       component: notice_list
     },
     {
-      path: `${comData.conutry_type}`+'/admin/news_report',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/news_report',
       name: 'news_report',
       component: news_report
     },
     {
-      path: `${comData.conutry_type}`+'/admin/destroy_audit',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/destroy_audit',
       name: 'destroy_audit',
       component: destroy_audit
     },
     {
-      path: `${comData.conutry_type}`+'/admin/unusual_audit',
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/unusual_audit',
       name: 'unusual_audit',
       component: unusual_audit
+    },
+    {
+      path: `${comData.conutry_type}`+'/HORKVIACYBHWPQXK/recommend_list',
+      name: 'recommend_list',
+      component: recommend_list
     },
   ]
 }

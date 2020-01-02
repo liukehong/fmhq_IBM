@@ -353,6 +353,39 @@ export const IBM_ADMIN_AUDITMT4RECOVERY = data => {
         data
     })
 }
+// 查询是否可以查看推荐列表的列表接口
+export const IBM_ADMIN_SELECTORGANIZATION = data => {
+    return axios({
+        url: `/ibm/admin/selectOrganization`,
+        method: 'post',
+        data
+    })
+}
+// 新增可查看推荐列表会员
+export const IBM_ADMIN_ADDORGANIZATION = data => {
+    return axios({
+        url: `/ibm/admin/addOrganization`,
+        method: 'post',
+        data
+    })
+}
+// 修改可查看推荐列表会员
+export const IBM_ADMIN_UPDATEORGANIZATION = data => {
+    return axios({
+        url: `/ibm/admin/updateOrganization`,
+        method: 'post',
+        data
+    })
+}
+// 删除可查看推荐列表会员
+export const IBM_ADMIN_DELECTORGANIZATION = data => {
+    return axios({
+        url: `/ibm/admin/delectOrganization`,
+        method: 'post',
+        data
+    })
+}
+
 export default {
     IBM_ADMIN_LOGIN,
     IBM_ADMIN_LOGOUT,
@@ -397,5 +430,9 @@ export default {
     IBM_ADMIN_MT4ERRORDELETE,
     IBM_ADMIN_QUERYLADDER,
     IBM_ADMIN_RECOVERYGOLD,
-    IBM_ADMIN_AUDITMT4RECOVERY
+    IBM_ADMIN_AUDITMT4RECOVERY,
+    IBM_ADMIN_SELECTORGANIZATION,
+    IBM_ADMIN_ADDORGANIZATION,
+    IBM_ADMIN_UPDATEORGANIZATION,
+    IBM_ADMIN_DELECTORGANIZATION
 }

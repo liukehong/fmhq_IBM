@@ -269,6 +269,7 @@ const en = {
         "8049": "Please Insert Amount",
         "8050": "Please Insert Withdrawal Amount",
         "8051": "User ID cannot contain spacebar",
+        "8052": "This User Has Added",
         /**
          * 数据库中已存在该记录
          */
@@ -1165,7 +1166,23 @@ const en = {
         text1: 'Get Verification Code Mode',
         text2: 'SMS',
         text3: 'Current Email',
-        text4: "Can't Exceed 1500 Characters!"
+        text4: "Can't Exceed 1500 Characters!",
+        text5: 'Lower List',
+        text6: 'New members who can view the recommendation list',
+        text7: 'Open type',
+        text8: 'Opening Time',
+        text9: 'Permanent Open',
+        text10: 'Not Permanently Open',
+        text11: 'Open At Present',
+        text12: 'Not Open At Present',
+        text13: 'Open A Day',
+        text14: 'Specify Open Time',
+        text15: 'Please Enter The Open Time',
+        text16: 'Open State',
+        text17: 'Modify State',
+        text18: 'Select Date Time',
+        text21: 'Type',
+        text22: 'There is an exception in the order. Please resubmit the application',
     }
 };
 export default en;

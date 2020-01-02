@@ -29,7 +29,7 @@
                 <!-- <p>{{ item.name }}</p>
                 <p>{{ item.type == 'btc'?'Bitcoin':item.type == 'eth'?'Ether':'USDT' }}</p>-->
                 <div class="img_box">
-                  <img :src="`../../../../../static/image/coin${item.type}.png`" alt>
+                  <img :src="`../../../../../static/image/coin${item.type}.png`" alt />
                 </div>
                 <div class="img_text">
                   <div class="text1">{{ item.name }}</div>
@@ -55,7 +55,9 @@
                 </el-select>
               </el-form-item>
               <!-- 您需要支付USD -->
-              <el-form-item :label="langType == 'zh'?$t('recharge.need_pay')+' USD：':'USD '+$t('recharge.need_pay')+'：'">
+              <el-form-item
+                :label="langType == 'zh'?$t('recharge.need_pay')+' USD：':'USD '+$t('recharge.need_pay')+'：'"
+              >
                 <div>{{ usd_val }}</div>
               </el-form-item>
               <!-- 需要支付-->
@@ -89,7 +91,7 @@
         :width="screenSize == 1?'20%':'90%'"
       >
         <div class="imgBox">
-          <img :src="resData.qrcodeUrl" alt>
+          <img :src="resData.qrcodeUrl" alt />
         </div>
         <!-- 将指定的数量发送到下面的地址 -->
         <div class="textBox">{{ $t('recharge.pay_addr') }}</div>
@@ -101,10 +103,7 @@
         <!-- 请输入内容 -->
         <el-input :readonly="true" class="urlBox" v-model="resData.address">
           <!-- 复制 -->
-          <el-button
-            @click="fnDoCopy"
-            slot="append"
-          >{{ $t('common.copy.copy') }}</el-button>
+          <el-button @click="fnDoCopy" slot="append">{{ $t('common.copy.copy') }}</el-button>
         </el-input>
         <span slot="footer" class="dialog-footer"></span>
       </el-dialog>
@@ -116,6 +115,7 @@
 import WatchScreen from "@/mixins/watchScreen.js";
 import floatNumber from "@/utils/floatNumber.js";
 import MessageBox from "@/mixins/messageBox.js";
+import axios from "axios";
 export default {
   name: "eMoney_manage",
   mixins: [WatchScreen, MessageBox],
@@ -125,21 +125,23 @@ export default {
       return this.value * (1 + 0.03);
     },
     coin_val: function() {
-      return floatNumber.multiply(this.value * (1 + 0.03), 1 / this.rate, 4);
+      // return floatNumber.multiply(this.value * (1 + 0.03), 1 / this.rate, 4);
+      return floatNumber.multiply(this.value * (1 + 0.03), this.rate/100, 4);
     },
     myCyrrency: function() {
       let vm = this;
       let val = vm.currency.toUpperCase();
-      if(vm.langType == 'zh'){
-        return  vm.$t("recharge.need_pay")+' '+val+ '：';
-      }else{
-        return  val+' '+vm.$t("recharge.need_pay")+'：';
+      if (vm.langType == "zh") {
+        return vm.$t("recharge.need_pay") + " " + val + "：";
+      } else {
+        return val + " " + vm.$t("recharge.need_pay") + "：";
       }
     }
   },
   data() {
     return {
-      langType: 'zh',
+      uuid: '',
+      langType: "zh",
       resData: "",
       loading: false,
       dialogVisible: false,
@@ -248,16 +250,14 @@ export default {
           vm.fnGetRate(vm.currency);
         });
     },
-    // 购买数量的变化
-    handleChange(val) {
-      let vm = this;
-    },
     // 类型变换
     fnGetRate(type) {
       let vm = this;
+      console.log(1);
       vm.currency = type; // 点击的类型
       let name = type == "btc" ? "BTCUSD" : type == "eth" ? "ETHUSD" : "USDT";
-      vm.exchangeRate.forEach((item, index) => {
+      let num = type == "btc"?1:type == 'eth'?2:3;
+      /* vm.exchangeRate.forEach((item, index) => {
         if (name == "USDT") {
           vm.rate = 1;
         } else {
@@ -265,24 +265,77 @@ export default {
             vm.rate = item.price;
           }
         }
-      });
+      }); */
+      vm.$main.loading = true;
+      vm.$api.IBM_TRA_GETRATE(num).then(res=>{
+        vm.$main.loading = false;
+        vm.rate = res.data.rate;
+        vm.uuid = res.data.uuid;
+      })
+      // console.log(vm.rate);
     },
     // 表单提交
     submitForm() {
       let vm = this;
+      let dealerOrderNo;
       if (!!!vm.currency) {
         vm.fnOpenMessageBox(vm.$t("recharge.text1"), "error"); // 请选择数字货币种类
         return false;
       }
-      vm.loading = true;
+      vm.$main.loading = true;
       let params = {
         usd: vm.usd_val, // 美元
         // rate: 6.75, // 汇率
-        rate: '', // 汇率
+        rate: "", // 汇率
         from: vm.currency.toUpperCase(), // 支付的币种
         to: vm.rate, // 该币种兑美元的汇率
-        money: vm.coin_val // 支付的金额
+        money: vm.coin_val, // 支付的金额
+        uuid: vm.uuid,
       };
+      console.log(params)
+
+      /* axios
+        .post("https://serviceapi.ibmcapital.co:383/anon/coinpay", {
+          uid: "CPM943762983",
+          coinName: vm.currency.toUpperCase(),
+          money: vm.coin_val
+        })
+        .then(res => {
+          console.log(res);
+          
+          if (res.data.code == 0) {
+            // vm.dialogVisible = true;
+            vm.resData = res.data.data;
+            if (!!!res.data.data.orderNo) {
+              vm.loading = false;
+              vm.fnOpenMessageBox(vm.$t("other.text22"), "error");
+            } else {
+              dealerOrderNo = res.data.data.orderNo;
+              // 继续请求接口
+              vm.$api
+                .IBM_TRA_ADDTAR({
+                  usd: vm.usd_val, // 美元
+                  rate: "", // 汇率
+                  from: vm.currency.toUpperCase(), // 支付的币种
+                  to: vm.rate, // 该币种兑美元的汇率
+                  money: vm.coin_val, // 支付的金额
+                  dealerOrderNo: dealerOrderNo
+                })
+                .then(res => {
+                  vm.loading = false;
+                  if (res.code == 0) {
+                    vm.dialogVisible = true;
+                  } else {
+                    vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
+                  }
+                });
+            }
+          } else {
+            vm.loading = false;
+            vm.fnOpenMessageBox(vm.$t(`errCode.${res.data.code}`), "error");
+          }
+        }); */
+
       vm.$api.IBM_TRA_MAT(params).then(res => {
         if (res.code == 0) {
           vm.dialogVisible = true;
@@ -290,7 +343,7 @@ export default {
         } else {
           vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
         }
-        vm.loading = false;
+        vm.$main.loading = false;
       });
     }
   }
@@ -338,7 +391,7 @@ export default {
   opacity: 0;
 }
 .border_acitve {
-  border: 2px dotted #fff!important;
+  border: 2px dotted #fff !important;
 }
 .paylist1 {
   .col-item {

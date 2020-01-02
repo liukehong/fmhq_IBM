@@ -68,6 +68,27 @@
                   v-model="ruleForm.translateEnglish"
                 ></el-input>
               </el-form-item>
+              <!-- 获取验证码方式 -->
+              <el-form-item :label="$t('other.text1')" v-if="dept == 11">
+                <el-radio-group v-model="sendCodeType">
+                  <el-radio :label="1">{{ $t('other.text2') }}</el-radio>
+                  <el-radio :label="2">{{ $t('register.email') }}</el-radio>
+                </el-radio-group>
+              </el-form-item>
+
+              <!-- 验证码 -->
+              <el-form-item :label="$t('transaction_pass.code')" v-if="dept == 11">
+                <el-input :placeholder="$t('transaction_pass.code')" v-model="phoneCord">
+                  <template slot="append">
+                    <GetCode
+                      apiUrl="IBM_UTILS_GETSECURITYCODE"
+                      :mobile="phone"
+                      :codeType1="sendCodeType"
+                    ></GetCode>
+                  </template>
+                </el-input>
+              </el-form-item>
+
               <el-form-item>
                 <!-- 提交 -->
                 <el-button type="primary" @click="submitForm('ruleForm')">{{ $t('common.submit') }}</el-button>
@@ -86,12 +107,17 @@ import GetUserInfo from "@/mixins/getUserInfo.js";
 import MyValidate from "@/mixins/myValidate.js";
 import MessageBox from "@/mixins/messageBox.js";
 import comData from "@/utils/data.js";
+import GetCode from "@/components/GetCode1";
 export default {
   name: "admin_transfer",
   mixins: [WatchScreen, GetUserInfo, MyValidate, MessageBox],
   inject: ["$main"],
   data() {
     return {
+      dept: '',
+      phone: '',
+      sendCodeType: 1,
+      phoneCord: '',
       walletType: "rp",
       user: {
         mobile: "" // 手机号
@@ -136,10 +162,18 @@ export default {
       ]
     };
   },
-  components: {},
+  components: {
+    GetCode
+  },
   computed: {},
   created: function() {
     let vm = this;
+    vm.fnGetNewInfo().then(res => {
+      console.log(res, 2233);
+      vm.phone = res.mobile;
+      vm.dept = res.deptId;
+      console.log(vm.dept)
+    });
     vm.fnInit();
   },
   methods: {
@@ -239,6 +273,9 @@ export default {
                   type:
                     vm.walletType == "cp" ? 1 : vm.walletType == "ap" ? 2 : 3
                 });
+                if(vm.dept == 11){
+                  params.security_code = vm.phoneCord;
+                }
                 vm.$api.IBM_ADMIN_TRANSFER(params).then(res => {
                   vm.$main.loading = false;
                   if (res.code == 0) {
@@ -246,7 +283,10 @@ export default {
                       vm.$t("asset_allocation.allocationErrInfo.success"),
                       "success"
                     );
-                    vm.$router.push(comData.conutry_type + "/admin/admin_home");
+                    // vm.$router.push(comData.conutry_type + "/admin/admin_home");
+                    vm.$router.push(
+                      comData.conutry_type + "/HORKVIACYBHWPQXK/admin_home"
+                    );
                     vm.fnInit();
                   } else {
                     vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");

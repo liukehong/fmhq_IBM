@@ -117,7 +117,7 @@
       <el-dialog
         :modal-append-to-body="false"
         :title="$t('system_container.tips')"
-        :visible.sync="dialogVisible"
+        :visible.sync="dialogVisible1"
         :width="screenSize == 1?'22%':'90%'"
         center
       >
@@ -132,6 +132,31 @@
           <el-form-item style="color: #fff;" :label="$t('withdraw_audit.reason2')">
             <el-input type="textarea" v-model="reason2"></el-input>
           </el-form-item>
+          <!-- 获取验证码方式 -->
+          <el-form-item :label="$t('other.text1')" v-if="dept==11">
+            <el-radio-group v-model="sendCodeType">
+              <el-radio :label="1">{{ $t('other.text2') }}</el-radio>
+              <el-radio :label="2">{{ $t('register.email') }}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <!-- 验证码 -->
+          <el-form-item :label="$t('transaction_pass.code')" v-if="dept == 11">
+            <el-input :placeholder="$t('transaction_pass.code')" v-model="phoneCord">
+              <template slot="append">
+                <GetCode
+                  v-if="!!dialogVisible1"
+                  apiUrl="IBM_UTILS_GETSECURITYCODE"
+                  :mobile="phone"
+                  :codeType1="sendCodeType"
+                ></GetCode>
+              </template>
+            </el-input>
+          </el-form-item>
+          <!-- 请先输入验证码 -->
+          <div
+            v-if="!!codeNull&&dept==11"
+            style="text-align:center; color: red;"
+          >{{ $t('transaction_pass.resetPassErrInfo.beforeCode') }}</div>
         </el-form>
         <span slot="footer" class="dialog-footer">
           <!-- 确 定 -->
@@ -142,6 +167,52 @@
           >{{ $t('el.colorpicker.confirm') }}</el-button>
         </span>
       </el-dialog>
+
+      <el-dialog
+        :modal-append-to-body="false"
+        :title="$t('system_container.tips')"
+        :visible.sync="dialogVisible"
+        :width="screenSize == 1?'22%':'90%'"
+        center
+      >
+        <el-form
+          style="padding: .2rem;"
+          label-position="top"
+          label-width="1.6rem"
+          class="demo-ruleForm item_form"
+        >
+          <!-- 获取验证码方式 -->
+          <el-form-item :label="$t('other.text1')">
+            <el-radio-group v-model="sendCodeType">
+              <el-radio :label="1">{{ $t('other.text2') }}</el-radio>
+              <el-radio :label="2">{{ $t('register.email') }}</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <!-- 验证码 -->
+          <el-form-item :label="$t('transaction_pass.code')">
+            <el-input :placeholder="$t('transaction_pass.code')" v-model="phoneCord">
+              <template slot="append">
+                <GetCode
+                  v-if="!!dialogVisible"
+                  apiUrl="IBM_UTILS_GETSECURITYCODE"
+                  :mobile="phone"
+                  :codeType1="sendCodeType"
+                ></GetCode>
+              </template>
+            </el-input>
+          </el-form-item>
+          <!-- 请先输入验证码 -->
+          <div
+            v-if="!!codeNull"
+            style="text-align:center; color: red;"
+          >{{ $t('transaction_pass.resetPassErrInfo.beforeCode') }}</div>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <!-- 确 定 -->
+          <el-button @click="dialogVisible = false">{{ $t('el.datepicker.cancel') }}</el-button>
+          <el-button type="primary" @click="fnDoSomeModal">{{ $t('el.colorpicker.confirm') }}</el-button>
+        </span>
+      </el-dialog>
     </div>
   </transition>
 </template>
@@ -150,19 +221,31 @@ import WatchScreen from "../../../mixins/watchScreen.js";
 import TableDate from "../../../../src/components/TableDate.vue";
 import formDate from "@/utils/formDate.js";
 import MessageBox from "@/mixins/messageBox.js";
+import GetCode from "@/components/GetCode1";
 export default {
   name: "destroy_audit",
   mixins: [WatchScreen, MessageBox],
   components: {
-    TableDate
+    TableDate,
+    GetCode
   },
   inject: ["$main"],
   data() {
     return {
+      phone: "",
+      codeNull: false,
+      sendCodeType: 1, // 1 手机号 2邮箱
+      dialogVisible: false,
+      dept: "",
+      phoneCord: "",
+      id: "",
+      type: "",
+      applyType: "通过",
+
       curId: "",
       reason1: "", // 中文原因
       reason2: "", // 英文原因
-      dialogVisible: false,
+      dialogVisible1: false,
       sizeList: [10, 15, 20, 25, 30],
       currentPage: 1,
       tableData: [],
@@ -179,6 +262,8 @@ export default {
   },
   mounted: function() {
     let vm = this;
+    vm.dept = vm.$main.userInfo.deptId;
+    vm.phone = vm.$main.userInfo.mobile;
     // 语言类型判断
     if (window.localStorage.getItem("locale")) {
       vm.lanType = window.localStorage.getItem("locale");
@@ -186,49 +271,126 @@ export default {
     vm.fnGetData();
   },
   methods: {
+    // 模态框点击事件
+    fnDoSomeModal() {
+      let vm = this;
+      if (!!!vm.phoneCord) {
+        vm.codeNull = true;
+      } else {
+        vm.dialogVisible = false;
+        // 接口
+        if (vm.applyType == "通过") {
+          // 通过
+          vm.$main.loading = true;
+          vm.$api
+            .IBM_ADMIN_AUDITMT4({
+              id: vm.id,
+              withdrawStatus: vm.type,
+              reason: "",
+              security_code: vm.phoneCord
+            })
+            .then(res => {
+              vm.$main.loading = false;
+              if (res.code == 0) {
+                vm.fnOpenMessageBox(
+                  vm.$t("withdraw_audit.auditErrInfo.through"),
+                  "success"
+                );
+                vm.fnGetData();
+              } else {
+                vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
+              }
+            });
+        } else if (vm.applyType == "恢复") {
+          vm.$main.loading = true;
+          vm.$api
+            .IBM_ADMIN_AUDITMT4RECOVERY({
+              id: vm.id,
+              security_code: vm.phoneCord
+            })
+            .then(res => {
+              vm.$main.loading = false;
+              if (res.code == 0) {
+                vm.fnOpenMessageBox(
+                  vm.$t("withdraw_audit.auditErrInfo.restore"),
+                  "success"
+                );
+                vm.fnGetData();
+              } else {
+                vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
+              }
+            });
+        }
+      }
+    },
     // 出金审核的恢复
     fnAuditGold(id) {
       let vm = this;
-      vm.$main.loading = true;
-      vm.$api
-        .IBM_ADMIN_AUDITMT4RECOVERY({
-          id: id
-        })
-        .then(res => {
-          vm.$main.loading = false;
-          if (res.code == 0) {
-            vm.fnOpenMessageBox(
-              vm.$t("withdraw_audit.auditErrInfo.restore"),
-              "success"
-            );
-            vm.fnGetData();
-          } else {
-            vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
-          }
-        });
+      vm.id = id;
+      if (vm.dept == 11) {
+        // 打开模特框的初始化
+        vm.sendCodeType = 1;
+        vm.phoneCord = "";
+        vm.codeNull = false;
+        vm.dialogVisible = true;
+        vm.applyType = "恢复";
+      } else {
+        vm.$main.loading = true;
+        vm.$api
+          .IBM_ADMIN_AUDITMT4RECOVERY({
+            id: id
+          })
+          .then(res => {
+            vm.$main.loading = false;
+            if (res.code == 0) {
+              vm.fnOpenMessageBox(
+                vm.$t("withdraw_audit.auditErrInfo.restore"),
+                "success"
+              );
+              vm.fnGetData();
+            } else {
+              vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
+            }
+          });
+      }
     },
     // 打开模态框
     fnOpenModal(id) {
       let vm = this;
-      vm.dialogVisible = true;
+      vm.dialogVisible1 = true;
       vm.reason1 = "";
       vm.reason2 = "";
       vm.curId = id;
+      vm.sendCodeType = 1;
+      vm.phoneCord = "";
+      vm.codeNull = false;
     },
     // 模态框点击事件
     fnDoSome() {
       let vm = this;
-      vm.$main.loading = true;
-      vm.dialogVisible = false;
-      // 驳回
-      vm.$api
-        .IBM_ADMIN_AUDITMT4({
-          id: vm.curId,
-          withdrawStatus: 0,
-          reason: vm.reason1,
-          reasonEn: vm.reason2
-        })
-        .then(res => {
+
+      let params = {
+        id: vm.curId,
+        withdrawStatus: 0,
+        reason: vm.reason1,
+        reasonEn: vm.reason2
+      };
+      if (vm.dept == 11) {
+        params.security_code = vm.phoneCord;
+        if (!!!vm.phoneCord) {
+          vm.codeNull = true;
+        } else {
+          dd();
+        }
+      } else {
+        dd();
+      }
+
+      function dd() {
+        vm.$main.loading = true;
+        vm.dialogVisible1 = false;
+        // 驳回
+        vm.$api.IBM_ADMIN_AUDITMT4(params).then(res => {
           vm.$main.loading = false;
           if (res.code == 0) {
             // 表单提交
@@ -241,6 +403,7 @@ export default {
             vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
           }
         });
+      }
     },
     // 状态
     STATUS(data) {
@@ -261,7 +424,16 @@ export default {
     // 列表操作
     fnChangeType(type, id) {
       let vm = this;
-      if (type == 1) {
+
+      if (vm.dept == 11) {
+        vm.type = type;
+        vm.id = id;
+        vm.sendCodeType = 1;
+        vm.phoneCord = "";
+        vm.codeNull = false;
+        vm.dialogVisible = true;
+        vm.applyType = "通过";
+      } else {
         // 通过
         vm.$main.loading = true;
         vm.$api
@@ -282,6 +454,8 @@ export default {
               vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
             }
           });
+      }
+      if (type == 1) {
       } else {
         // 驳回
         vm.$prompt(

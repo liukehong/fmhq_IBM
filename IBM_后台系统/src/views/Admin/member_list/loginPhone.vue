@@ -27,6 +27,21 @@
             </el-select>
           </el-input>
         </el-form-item>
+        <!-- 获取验证码方式 -->
+        <el-form-item :label="$t('other.text1')" v-if="dept == 11">
+          <el-radio-group v-model="sendCodeType">
+            <el-radio :label="1">{{ $t('other.text2') }}</el-radio>
+            <el-radio :label="2">{{ $t('register.email') }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <!-- 验证码 -->
+        <el-form-item :label="$t('transaction_pass.code')" v-if="dept == 11">
+          <el-input :placeholder="$t('transaction_pass.code')" v-model="phoneCord">
+            <template slot="append">
+              <GetCode apiUrl="IBM_UTILS_GETSECURITYCODE" :mobile="phone" :codeType1="sendCodeType"></GetCode>
+            </template>
+          </el-input>
+        </el-form-item>
       </div>
     </div>
     <!-- 提交 -->
@@ -41,12 +56,18 @@ import WatchScreen from "../../../mixins/watchScreen.js";
 import GetUserInfo from "../../../mixins/getUserInfo.js";
 import MessageBox from "@/mixins/messageBox.js";
 import comData from "@/utils/data.js";
+import GetCode from "@/components/GetCode1";
 export default {
   name: "member_list_phone",
   mixins: [WatchScreen, GetUserInfo, MessageBox],
   inject: ["p", "$main"],
   data() {
     return {
+      phone: "",
+      sendCodeType: 1, // 1 手机号 2邮箱
+      dept: "",
+      phoneCord: "",
+
       phoneCode: "+86",
       list: comData.phone,
       user: {
@@ -58,9 +79,13 @@ export default {
       rules: {}
     };
   },
-  components: {},
+  components: {
+    GetCode
+  },
   mounted: function() {
     let vm = this;
+    vm.dept = vm.$main.userInfo.deptId;
+    vm.phone = vm.$main.userInfo.mobile;
     vm.fnPhoneType();
     vm.fnInfo();
   },
@@ -102,7 +127,7 @@ export default {
         if (valid) {
           if (!!!vm.ruleForm.mobile) {
             vm.fnOpenMessageBox(
-              vm.$t("transaction_pass.resetPassErrInfo.beforeCode"),
+              vm.$t("register.regErrInfo.phone"),
               "error"
             ); // 请先填写手机号
             return false;
@@ -112,6 +137,9 @@ export default {
             mobile: phone,
             uId: vm.p.info.user_id
           };
+          if(vm.dept == 11){
+            params.security_code = vm.phoneCord;
+          }
           vm.$main.loading = true;
           console.log(params);
           vm.$api.IBM_ADMIN_UPDATEOPT(params).then(res => {

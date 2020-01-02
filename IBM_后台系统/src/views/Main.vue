@@ -4,17 +4,17 @@
       <div class="logo_box">
         <div class="logo">
           <!-- <img src='./../image/home_logo@2x.png' alt=''> -->
-          <img src="./../image/logo.svg" alt>
+          <img src="./../image/logo.svg" alt />
         </div>
       </div>
     </div>
     <aside class="sidebar_box" :class="{'open': open}">
-      <the-nav :userInfo="userInfo" @selectMenu="open=true"/>
+      <the-nav :userInfo="userInfo" @selectMenu="open=true" />
     </aside>
     <section class="right_container" :class="{'open': open}">
       <el-header class="header" height=".7rem">
-        <el-button class="menuBtn" id="menuBtn" icon="el-icon-tickets" @click="handleOpen"/>
-        <the-header :userInfo="userInfo" style="color:#fff;" v-show="showHeader"/>
+        <el-button class="menuBtn" id="menuBtn" icon="el-icon-tickets" @click="handleOpen" />
+        <the-header :userInfo="userInfo" style="color:#fff;" v-show="showHeader" />
       </el-header>
       <div class="main">
         <el-scrollbar style="height: 100%;">
@@ -134,17 +134,18 @@ export default {
     // 获取公告信息
     fnGetNews() {
       let vm = this;
-      let langType = 'zh';
-      if(!!window.localStorage.getItem("locale")){
-        langType = window.localStorage.getItem('locale');
+      let langType = "zh";
+      if (!!window.localStorage.getItem("locale")) {
+        langType = window.localStorage.getItem("locale");
       }
       if (!!vm.isLogin) {
         if (this.$route.matched[0].name != "admin") {
           // 是登录页进来并且不是管理员系统
           let params = {
-            type: langType == 'zh'?1:2,
+            type: langType == "zh" ? 1 : 2,
             currPage: 1,
-            totalPage: 999
+            totalPage: 999,
+            os_type: comData.os_type
           };
           vm.$api.IBM_HOME_NOTICEINFO(params).then(res => {
             if (res.data.list.length > 0) {
@@ -167,7 +168,7 @@ export default {
       vm.$confirm(
         `<p>${vm.$t("product_rule.verifyUserErr.infoErr")}</p><p>${vm.$t(
           "product_rule.verifyUserErr.submit"
-        )}</p><p style="color: red;">${data||''}</p>`,
+        )}</p><p style="color: red;">${data || ""}</p>`,
         vm.$t("system_container.tips"),
         {
           confirmButtonText: vm.$t("system_container.ok"),
@@ -196,24 +197,24 @@ export default {
           // 如果不符合，要清除缓存
           if (!!window.localStorage.getItem("userInfo")) {
             let userInfo = JSON.parse(window.localStorage.getItem("userInfo"));
-            if(userInfo.cardStatus == 0){
+            if (userInfo.cardStatus == 0) {
               // 判断中文还是英文
-              if(!!window.localStorage.getItem("locale")){
+              if (!!window.localStorage.getItem("locale")) {
                 let langTyp = window.localStorage.getItem("locale");
                 let msg;
-                if(langTyp == 'zh'){
+                if (langTyp == "zh") {
                   msg = userInfo.cardReason;
-                }else{
+                } else {
                   msg = userInfo.cardReasonEnglish;
                 }
-                vm.fnOpen(msg); // 弹出信息
+                vm.fnOpen(msg);
               }
             }
           }
         }
       }
     },
-    fnGetUserInfo () {
+    fnGetUserInfo() {
       let vm = this;
       vm.fnGetNewInfo().then(res => {
         vm.userInfo = res;
@@ -228,9 +229,11 @@ export default {
     // '$route': 'fnInit',
     $route(to, from) {
       let vm = this;
-      vm.isLogin = !!window.sessionStorage.getItem("isLogin")? window.sessionStorage.getItem("isLogin"): ""
+      vm.isLogin = !!window.sessionStorage.getItem("isLogin")
+        ? window.sessionStorage.getItem("isLogin")
+        : "";
       vm.fnGetUserInfo();
-      if(!!vm.isLogin){
+      if (!!vm.isLogin) {
         vm.fnInit();
         vm.fnGetNews();
       }

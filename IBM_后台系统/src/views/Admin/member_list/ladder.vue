@@ -23,6 +23,21 @@
           <!-- 查询 -->
           <el-button @click="fnFinduserName">{{ $t('asset_transfer.query') }}</el-button>
         </el-form-item>
+        <!-- 获取验证码方式 -->
+        <el-form-item :label="$t('other.text1')" v-if="dept == 11">
+          <el-radio-group v-model="sendCodeType">
+            <el-radio :label="1">{{ $t('other.text2') }}</el-radio>
+            <el-radio :label="2">{{ $t('register.email') }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <!-- 验证码 -->
+        <el-form-item :label="$t('transaction_pass.code')" v-if="dept == 11">
+          <el-input :placeholder="$t('transaction_pass.code')" v-model="phoneCord">
+            <template slot="append">
+              <GetCode apiUrl="IBM_UTILS_GETSECURITYCODE" :mobile="phone" :codeType1="sendCodeType"></GetCode>
+            </template>
+          </el-input>
+        </el-form-item>
       </div>
     </div>
     <!-- 提交 -->
@@ -37,13 +52,18 @@ import WatchScreen from "../../../mixins/watchScreen.js";
 import GetUserInfo from "../../../mixins/getUserInfo.js";
 import MessageBox from "@/mixins/messageBox.js";
 import comData from "@/utils/data.js";
+import GetCode from "@/components/GetCode1";
 export default {
   name: "member_list_ladder",
   mixins: [WatchScreen, GetUserInfo, MessageBox],
   inject: ["p", "$main"],
   data() {
     return {
-      parentId: '',
+      phone: "",
+      sendCodeType: 1, // 1 手机号 2邮箱
+      dept: "",
+      phoneCord: "",
+      parentId: "",
       ruleForm: {
         parUserId: "" // 新上级ID
       },
@@ -51,9 +71,13 @@ export default {
       toUserName: ""
     };
   },
-  components: {},
+  components: {
+    GetCode
+  },
   mounted: function() {
     let vm = this;
+    vm.dept = vm.$main.userInfo.deptId;
+    vm.phone = vm.$main.userInfo.mobile;
     vm.fnInit();
     vm.fnGetData();
   },
@@ -129,6 +153,9 @@ export default {
             parUserId: vm.ruleForm.parUserId,
             subUserId: vm.p.info.user_id
           };
+          if(vm.dept == 11){
+            params.security_code = vm.phoneCord;
+          }
           vm.$main.loading = true;
           vm.$api.IBM_ADMIN_LADDER(params).then(res => {
             vm.$main.loading = false;

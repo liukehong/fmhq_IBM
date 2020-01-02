@@ -89,6 +89,21 @@ export const IBM_UTILS_SENDMAILCODE = data => {
         data
     })
 }
+// 回调手机或者邮件验证码
+/* export const IBM_UTILS_GETSECURITYCODE = data => {
+    return axios({
+        url: `/ibm/utils/get_security_code`,
+        method: 'post',
+        data
+    })
+} */
+export const IBM_UTILS_GETSECURITYCODE = data => {
+    return axios({
+        url: `/ibm/utils/get_security_code?codeType=${data.codeType}`,
+        method: 'get',
+        data
+    })
+}
 // 修改用户信息
 export const IBM_USER_UPDATEUSER = data => {
     return axios({
@@ -185,10 +200,25 @@ export const EXRATE_PAIR_NUMF_15 = data => {
         baseURL: baseURL
     })
 }
+// 获取币种兑换率1
+export const IBM_TRA_GETRATE = data => {
+    return axios({
+        url: `/ibm/tra/get_rate/${data}`,
+        method: 'get',
+    })
+}
 // 账户入金
 export const IBM_TRA_MAT = data => {
     return axios({
         url: `/ibm/tra/mat`,
+        method: 'post',
+        data
+    })
+}
+// 账户入金1
+export const IBM_TRA_ADDTAR = data => {
+    return axios({
+        url: `/ibm/tra/addTar`,
         method: 'post',
         data
     })
@@ -405,6 +435,7 @@ export default {
     IBM_UTILS_SENDMOBILECODE,
     IBM_UTILS_MOBILECODE,
     IBM_UTILS_SENDMAILCODE,
+    IBM_UTILS_GETSECURITYCODE,
     IBM_USER_UPDATEUSER,
     IBM_USER_UPDATEBLOCKCHAIN,
     IBM_USER_UPDATEPW,
@@ -417,7 +448,9 @@ export default {
     IBM_MAT_INFO,
     IBM_REGISTER_REGSUB,
     EXRATE_PAIR_NUMF_15,
+    IBM_TRA_GETRATE,
     IBM_TRA_MAT,
+    IBM_TRA_ADDTAR,
     IBM_RATE_RATE,
     IBM_RECHARGE_GOLDRECHARGE,
     IBM_WITHDRAW_GETGOLD,

@@ -10,36 +10,37 @@
     >{{ $t('news_report.add') }}</el-button>
     <TableDate @changeDate="changeDataByDate" v-if="false"></TableDate>
     <div class="sel_label sel_label_0" style="overflow:hidden;">
-      <!-- 请选择 -->
+      <!-- 是否永久开发 -->
       <el-select
         :class="screenSize == 1?'rem_2':'rem_100'"
         v-model="params.type"
         :placeholder="$t('el.select.placeholder')"
         @change="changeState"
       >
-        <!-- 全部 -->
-        <el-option :label="$t('el.table.clearFilter')" value></el-option>
-        <!-- 中文 -->
-        <el-option label="中文" :value="1"></el-option>
-        <!-- English -->
-        <el-option label="English" :value="2"></el-option>
-        <!-- 日本語 -->
-        <el-option label="日本語" :value="3"></el-option>
+        <!-- 未永久开发 -->
+        <el-option :label="$t('other.text10')" :value="0"></el-option>
+        <!-- 永久开发 -->
+        <el-option :label="$t('other.text9')" :value="1"></el-option>
       </el-select>
-      <!-- 请选择 -->
+      <!-- 目前是否开发 -->
       <el-select
+        v-if="params.type == 0"
         :class="screenSize == 1?'rem_2':'rem_100'"
-        v-model="params.os_type"
+        v-model="params.status"
         :placeholder="$t('el.select.placeholder')"
         @change="changeState"
       >
-        <!-- 全部 -->
-        <el-option :label="$t('el.table.clearFilter')" value></el-option>
-        <!-- 完整版 -->
-        <el-option label="partner" :value="1"></el-option>
-        <!-- 阉割版 -->
-        <el-option label="login" :value="2"></el-option>
+        <!-- 目前开发 -->
+        <el-option :label="$t('other.text11')" :value="1"></el-option>
+        <!-- 目前未开发 -->
+        <el-option :label="$t('other.text12')" :value="2"></el-option>
       </el-select>
+    </div>
+    <div class="sel_label sel_label_0" style="overflow:hidden;">
+      <!-- 输入用户ID -->
+      <el-input class="sel_input" v-model="params.uId" :placeholder="$t('common.user_id')"></el-input>
+      <!-- 搜索 -->
+      <el-button @click="fnContentFil" class="sel_btn" type="primary">{{ $t('common.search') }}</el-button>
     </div>
     <el-table
       border
@@ -52,30 +53,27 @@
     >
       <!-- 创建时间 -->
       <el-table-column :label="$t('notice_list.createTime')">
-        <template slot-scope="scope">{{ scope.row.createTime|FMT_DATE }}</template>
+        <template slot-scope="scope">{{ scope.row.time|FMT_DATE }}</template>
       </el-table-column>
-      <!-- 标题 -->
-      <el-table-column :label="$t('notice_list.title')">
-        <template slot-scope="scope">{{ scope.row.title }}</template>
+      <!-- 用户id -->
+      <el-table-column :label="$t('login.userId')">
+        <template slot-scope="scope">{{ scope.row.userId }}</template>
       </el-table-column>
-      <!-- 分类 -->
-      <el-table-column :label="$t('other.text21')">
-        <template
-          slot-scope="scope"
-        >{{ scope.row.service == 1?'partner':scope.row.service == 2? 'login': 'partner&login' }}</template>
+      <!-- 用户名 -->
+      <el-table-column :label="$t('login.username')">
+        <template slot-scope="scope">{{ scope.row.username }}</template>
       </el-table-column>
-      <!-- 语言 -->
-      <el-table-column :label="$t('notice_list.language')">
-        <!-- 中文 -->
-        <!-- English -->
-        <!-- 日本語 -->
-        <template
-          slot-scope="scope"
-        >{{ scope.row.type == 1?'中文':scope.row.type == 2?'English':'日本語' }}</template>
+      <!-- 开始时间 -->
+      <el-table-column :label="$t('el.datepicker.startTime')">
+        <template slot-scope="scope">{{ fnTime(scope.row.startTime) }}</template>
       </el-table-column>
-      <!-- 序号 -->
-      <el-table-column :label="$t('notice_list.sort')">
-        <template slot-scope="scope">{{ scope.row.whole }}</template>
+      <!-- 结束时间 -->
+      <el-table-column :label="$t('el.datepicker.endTime')">
+        <template slot-scope="scope">{{ fnTime(scope.row.endTime) }}</template>
+      </el-table-column>
+      <!-- 开发状态 -->
+      <el-table-column :label="$t('other.text16')">
+        <template slot-scope="scope">{{ fnOpenType(scope.row.type) }}</template>
       </el-table-column>
       <!-- 操作 -->
       <el-table-column width="200" :label="$t('table.handle')">
@@ -109,7 +107,7 @@
     </div>
     <el-dialog
       :modal-append-to-body="false"
-      :title="$t('notice_detail.editErrInfo.sureDel')"
+      :title="$t('system_container.tips')"
       :visible.sync="dialogVisible"
       :width="screenSize == 1?'22%':'90%'"
       center
@@ -170,7 +168,8 @@ export default {
   },
   data() {
     return {
-      id: '',
+      id: "",
+      phone: "",
       codeNull: false,
       sendCodeType: 1, // 1 手机号 2邮箱
       dialogVisible: false,
@@ -180,12 +179,11 @@ export default {
       currentPage: 1,
       tableData: [],
       params: {
-        type: "",
-        startTime: "",
-        endTime: "",
+        type: 0, // 1永久开发  0未永久开发
+        status: 1, // (1目前开放，2目前未开放。注：type = 0时传1或者2.type=1时不要传1或2就行)
+        uId: "",
         totalPage: 10,
-        currPage: 1,
-        os_type: ""
+        currPage: 1
       },
       total: 0
     };
@@ -204,10 +202,11 @@ export default {
         vm.codeNull = true;
       } else {
         vm.dialogVisible = false;
+        // 接口
         // 调删除接口
         vm.$main.loading = true;
         vm.$api
-          .IBM_ADMIN_DELECTNOTICE({
+          .IBM_ADMIN_DELECTORGANIZATION({
             id: vm.id,
             security_code: vm.phoneCord
           })
@@ -223,6 +222,27 @@ export default {
               vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");
             }
           });
+      }
+    },
+
+    // 用户名或ID筛选
+    fnContentFil() {
+      let vm = this;
+      vm.params.currPage = 1;
+      vm.currentPage = 1;
+      vm.fnGetData();
+    },
+    fnTime(data) {
+      let vm = this;
+      return formDate(data);
+    },
+    // 开放状态
+    fnOpenType(type) {
+      let vm = this;
+      if (type == 1) {
+        return vm.$t("other.text9");
+      } else {
+        return vm.$t("other.text10");
       }
     },
     // 每页要展示多少条
@@ -252,6 +272,7 @@ export default {
     // 删除新闻
     fnDelete(data) {
       let vm = this;
+
       if (vm.dept == 11) {
         // 打开模特框的初始化
         vm.sendCodeType = 1;
@@ -275,7 +296,7 @@ export default {
             // 调删除接口
             vm.$main.loading = true;
             vm.$api
-              .IBM_ADMIN_DELECTNOTICE({
+              .IBM_ADMIN_DELECTORGANIZATION({
                 id: data.id
               })
               .then(res => {
@@ -316,9 +337,27 @@ export default {
     // 获取列表数据
     fnGetData() {
       let vm = this;
-      let params = Object.assign({}, vm.params);
+      // 参数的处理
+      let params;
+      if (vm.params.type == 0) {
+        params = {
+          type: vm.params.type, // 1永久开发  0未永久开发
+          status: vm.params.status, // (1目前开放，2目前未开放。注：type = 0时传1或者2.type=1时不要传1或2就行)
+          uId: vm.params.uId,
+          totalPage: vm.params.totalPage,
+          currPage: vm.params.currPage
+        };
+      } else {
+        params = {
+          type: vm.params.type, // 1永久开发  0未永久开发
+          status: "",
+          uId: vm.params.uId,
+          totalPage: vm.params.totalPage,
+          currPage: vm.params.currPage
+        };
+      }
       vm.$main.loading = true;
-      vm.$api.IBM_ADMIN_NOTICEINFO(params).then(res => {
+      vm.$api.IBM_ADMIN_SELECTORGANIZATION(params).then(res => {
         if (res.code == 0) {
           vm.tableData = res.data.list;
           vm.total = res.data.totalCount;

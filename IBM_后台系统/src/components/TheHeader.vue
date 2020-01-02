@@ -34,12 +34,14 @@ export default {
       // 管理员登录进来会员系统的情况
       if (!!vm.isAdminEnter) {
         vm.$main.loading = false;
-        vm.$router.push(comData.conutry_type + "/admin/admin_home");
+        // vm.$router.push(comData.conutry_type + "/admin/admin_home");
+        vm.$router.push(comData.conutry_type + "/HORKVIACYBHWPQXK/admin_home");
       } else {
         if (this.$route.matched[0].name == "admin") {
           vm.$api.IBM_ADMIN_LOGOUT().then(res => {
             vm.$main.loading = false;
-            vm.$router.push(comData.conutry_type + "/admin_login");
+            // vm.$router.push(comData.conutry_type + "/admin_login");
+            vm.$router.push(comData.conutry_type + "/HORKVIACYBHWPQXK");
           });
         } else {
           vm.$api.IBM_LOGIN_LOGOUT().then(res => {

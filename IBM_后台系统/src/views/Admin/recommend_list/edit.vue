@@ -8,35 +8,21 @@
         label-width="1.6rem"
         class="demo-ruleForm item_form"
       >
-        <!-- 版本 -->
-        <el-form-item :label="$t('other.text21')">
-          <!-- 请选择 -->
-          <el-select v-model="ruleForm.service" :placeholder="$t('el.select.placeholder')">
-            <el-option label="partner" :value="1"></el-option>
-            <el-option label="login" :value="2"></el-option>
-            <el-option label="partner&login" :value="3"></el-option>
-          </el-select>
-        </el-form-item>
-        <!-- 语言 -->
-        <el-form-item :label="$t('notice_detail.language')">
+        <!-- 类型 -->
+        <el-form-item :label="$t('other.text7')">
           <!-- 请选择 -->
           <el-select v-model="ruleForm.type" :placeholder="$t('el.select.placeholder')">
-            <el-option label="中文" :value="1"></el-option>
-            <el-option label="English" :value="2"></el-option>
-            <el-option label="日本語" :value="3"></el-option>
+            <!-- 永久开发 -->
+            <el-option :label="$t('other.text9')" :value="1"></el-option>
+            <!-- 开发一天 -->
+            <el-option :label="$t('other.text13')" :value="2"></el-option>
+            <!-- 指定开发时间 -->
+            <el-option :label="$t('other.text14')" :value="3"></el-option>
           </el-select>
         </el-form-item>
-        <!-- 排序 -->
-        <el-form-item :label="$t('notice_detail.sort')">
-          <el-input-number v-model="ruleForm.whole" :min="0" :label="$t('notice_detail.sort')"></el-input-number>
-        </el-form-item>
-        <!-- 标题 -->
-        <el-form-item prop="title" :label="$t('notice_detail.title')" style="max-width: 6rem;">
-          <el-input :placeholder="$t('notice_detail.title')" v-model="ruleForm.title"></el-input>
-        </el-form-item>
-        <!-- 内容 -->
-        <el-form-item prop="content" :label="$t('notice_detail.content')" style="max-width: 10rem;">
-          <Editor :showHeader="showHeader" v-model="ruleForm.content"></Editor>
+        <!-- 类型 -->
+        <el-form-item :label="$t('other.text8')" v-if="ruleForm.type != 1">
+          <TableDate :openType="ruleForm.type" @changeDate="changeDataByDate"></TableDate>
         </el-form-item>
         <!-- 获取验证码方式 -->
         <el-form-item :label="$t('other.text1')" v-if="dept == 11">
@@ -46,7 +32,7 @@
           </el-radio-group>
         </el-form-item>
         <!-- 验证码 -->
-        <el-form-item :label="$t('transaction_pass.code')" style="max-width: 6rem;" v-if="dept== 11">
+        <el-form-item :label="$t('transaction_pass.code')" style="max-width: 6rem;" v-if="dept == 11">
           <el-input :placeholder="$t('transaction_pass.code')" v-model="phoneCord">
             <template slot="append">
               <GetCode apiUrl="IBM_UTILS_GETSECURITYCODE" :mobile="phone" :codeType1="sendCodeType"></GetCode>
@@ -66,80 +52,104 @@
 
 <script>
 import WatchScreen from "../../../mixins/watchScreen.js";
-import Editor from "@/components/Editor";
 import MessageBox from "@/mixins/messageBox.js";
 import MyValidate from "@/mixins/myValidate.js";
+import TableDate from "../../../../src/components/TableDate2.vue";
+import formDate from "@/utils/formDate.js";
 import GetCode from "@/components/GetCode1";
 export default {
   name: "notice_list_add",
   mixins: [WatchScreen, MessageBox, MyValidate],
   inject: ["p", "$main"],
   components: {
-    Editor,
+    TableDate,
     GetCode
   },
   data() {
     return {
       phone: "",
       sendCodeType: 1, // 1 手机号 2邮箱
-      dialogVisible: false,
       dept: "",
       phoneCord: "",
-      showHeader: true,
-      path: "",
-      total: 0,
-      currentPage: 1,
+      id: "",
       ruleForm: {
-        service: 1, // 分类
-        title: "", // 标题
-        content: "", // 内容
-        type: 1, // 1中文 2英语 3日本话
-        whole: 0 // 排序
+        uid: "",
+        type: 1, //（1永久开放，2开放一天，3指定开放时间）
+        startTime: "",
+        endTime: ""
       },
-      rules: {
-        // 请填写标题
-        title: [
-          {
-            required: true,
-            message: "notice_detail.editErrInfo.title",
-            trigger: "blur"
-          }
-        ],
-        // 请填写内容
-        content: [
-          {
-            required: true,
-            message: "notice_detail.editErrInfo.content",
-            trigger: "blur"
-          }
-        ]
-      }
+      rules: {}
     };
   },
   mounted: function() {
     let vm = this;
     vm.dept = vm.$main.userInfo.deptId;
     vm.phone = vm.$main.userInfo.mobile;
+    // 初始化数据
+    vm.fnInit();
   },
   methods: {
+    fnInit() {
+      let vm = this;
+      vm.id = vm.p.info.id;
+      vm.startTime = vm.p.info.startTime;
+    },
+    // 时间范围选择
+    changeDataByDate(data) {
+      let vm = this;
+      debugger;
+      if (vm.ruleForm.type == 2) {
+        vm.ruleForm.startTime = data;
+      } else {
+        vm.ruleForm.startTime = data[0];
+        vm.ruleForm.endTime = data[1];
+        // vm.ruleForm.startTime = data.startTime;
+        // vm.ruleForm.endTime = data.endTime;
+      }
+    },
     // 表单提交
     submitForm(formName) {
       let vm = this;
       vm.myValidate(formName).then(err => {
         if (!!!err) {
-          let params = Object.assign({}, vm.ruleForm);
-
-          if (vm.dept == 11) {
+          let params;
+          if (vm.ruleForm.type == 1) {
+            params = {
+              id: vm.id,
+              type: vm.ruleForm.type
+            };
+          } else if (vm.ruleForm.type == 2) {
+            if (!!!vm.ruleForm.startTime) {
+              vm.fnOpenMessageBox(vm.$t("other.text15"), "error");
+              return false;
+            }
+            params = {
+              id: vm.id,
+              type: vm.ruleForm.type,
+              startTime: vm.ruleForm.startTime
+            };
+          } else {
+            if (!!!vm.ruleForm.startTime || !!!vm.ruleForm.endTime) {
+              vm.fnOpenMessageBox(vm.$t("other.text15"), "error");
+              return false;
+            }
+            params = {
+              id: vm.id,
+              type: vm.ruleForm.type,
+              startTime: vm.ruleForm.startTime,
+              endTime: vm.ruleForm.endTime
+            };
+          }
+          vm.$main.loading = true;
+          if(vm.dept == 11){
             params.security_code = vm.phoneCord;
           }
-
-          vm.$main.loading = true;
-          vm.$api.IBM_ADMIN_ADDNOTICE(params).then(res => {
+          vm.$api.IBM_ADMIN_UPDATEORGANIZATION(params).then(res => {
             vm.$main.loading = false;
             if (res.code == 0) {
-              // 添加成功
+              // 修改成功
               vm.fnOpenMessageBox(
-                vm.$t("notice_detail.editErrInfo.addSuc"),
+                vm.$t("personal_profile.setUserInfoErr.success"),
                 "success"
               );
               vm.p.pageType = "list";

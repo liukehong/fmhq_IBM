@@ -11,7 +11,10 @@ const getPath = function (num) {
       break;
     case 2:
       // 本地
-      return "http://192.168.1.161:8080"
+      return "http://192.168.1.100:8080"
+    case 3:
+      // 测试环境
+      return "http://47.112.217.241:8080"
       break;
     default:
       return "https://api.ibmcapital.co:18443"

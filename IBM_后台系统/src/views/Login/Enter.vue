@@ -61,24 +61,18 @@
             ></el-input>
           </el-form-item>
           <!-- 验证码方式 -->
-          <el-form-item v-if="ruleForm.os_type == 1&&loginType == 0" >
-             <el-select
-              style="width: 100%;"
-              v-model="sendCodeType"
-              placeholder="请选择"
-            >
-              <el-option
-                :label="$t('other.text2')"
-                :value="1"
-              ></el-option>
-              <el-option
-                :label="$t('register.email')"
-                :value="2"
-              ></el-option>
+          <el-form-item v-if="ruleForm.os_type == 1&&loginType == 0">
+            <el-select style="width: 100%;" v-model="sendCodeType" placeholder="请选择">
+              <el-option :label="$t('other.text2')" :value="1"></el-option>
+              <el-option :label="$t('register.email')" :value="2"></el-option>
             </el-select>
           </el-form-item>
           <!-- 验证码 -->
-          <el-form-item v-if="ruleForm.os_type == 1&&loginType == 0" class="codeWrap" prop="mobileCode">
+          <el-form-item
+            v-if="ruleForm.os_type == 1&&loginType == 0"
+            class="codeWrap"
+            prop="mobileCode"
+          >
             <el-input :placeholder="$t('login.code')" v-model="ruleForm.mobileCode">
               <template slot="append">
                 <GetCode
@@ -159,7 +153,7 @@ export default {
   data() {
     return {
       sendCodeType: 1,
-      btnText: this.$t('transaction_pass.get'),
+      btnText: this.$t("transaction_pass.get"),
       loginType: this.fnLoginType(), // 0 用户  1管理员  2管理员2
       dialogVisible: false, // 模态框控制
       d: "", // 时间戳
@@ -231,7 +225,7 @@ export default {
       val = window.localStorage.getItem("locale");
     }
     vm.$i18n.locale = val;
-    vm.btnText = vm.$t('transaction_pass.get');
+    vm.btnText = vm.$t("transaction_pass.get");
     // 判断登录类型
     vm.fnCaptcha();
     if (window.localStorage.getItem("locale")) {
@@ -324,7 +318,7 @@ export default {
       vm.value = val;
       window.localStorage.setItem("locale", vm.value);
       vm.$i18n.locale = val;
-      vm.btnText = vm.$t('transaction_pass.get')
+      vm.btnText = vm.$t("transaction_pass.get");
     },
     // 登陆
     submitForm(formName) {
@@ -346,7 +340,8 @@ export default {
               password: vm.ruleForm.password
             };
             tokenName = "admin_token";
-            _url = comData.conutry_type + "/admin/admin_home";
+            // _url = comData.conutry_type + "/admin/admin_home";
+            _url = comData.conutry_type + "/HORKVIACYBHWPQXK/admin_home";
           } else {
             // 用来判断是否从登录页面进入首页
             window.sessionStorage.setItem("isLogin", "ok");
@@ -355,7 +350,7 @@ export default {
               delete params.mobileCode;
             }
           }
-          console.log(params)
+          console.log(params);
           vm.p.loading = true;
           vm.$api[pathName](params).then(res => {
             vm.p.loading = false;
@@ -367,7 +362,14 @@ export default {
               // 保存登录信息
               window.localStorage.setItem("userInfo", JSON.stringify(res.data));
               axios.defaults.headers.TOKEN = res.data.token; // 设置请求头
-              vm.$router.push({ path: _url });
+              // 如果是2844387
+              if (JSON.stringify(res.data.userId) == 2844387) {
+                vm.$router.push({
+                  path: comData.conutry_type + "/HORKVIACYBHWPQXK/admin_feedback"
+                });
+              } else {
+                vm.$router.push({ path: _url });
+              }
             } else {
               vm.fnCaptcha();
               vm.fnOpenMessageBox(vm.$t(`errCode.${res.code}`), "error");

@@ -99,7 +99,8 @@ export default function $axios (options) {
 			switch (data.code) {
 				case 200:
 				// ElementUI.Message.error(data.msg);
-				let url = fnLoginType() == 'admin'?'/admin_login':'/login'
+				// let url = fnLoginType() == 'admin'?'/admin_login':'/login'
+				let url = fnLoginType() == 'admin'?'/HORKVIACYBHWPQXK':'/login'
 				router.push({
 					path: `${url}`
 				})
@@ -124,7 +125,8 @@ export default function $axios (options) {
 					// token失效
 					// ElementUI.Message.error('token失效，重新登录');
 					// 判断登录类型
-					let url = fnLoginType() == 'admin'?'/admin_login':'/login'
+					// let url = fnLoginType() == 'admin'?'/admin_login':'/login'
+					let url = fnLoginType() == 'admin'?'/HORKVIACYBHWPQXK':'/login'
 					// 路由跳转
 					router.push({
 						path: `${url}`
